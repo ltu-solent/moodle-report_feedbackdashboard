@@ -1,0 +1,27 @@
+table#feedbackoverview {
+    width: 100%;
+}
+
+#feedbackoverview table, p{
+  font-size: 15px
+}
+
+#feedbackoverview th{
+  text-align: left;
+}
+
+#feedbackoverview th, td{
+  padding: 5px;
+}
+
+#feedbackoverview td{
+  border-bottom: 1px solid #eee;
+}
+
+.feedbackoverview_unit {
+  margin-bottom: 50px;
+}
+
+.cell.c4 {
+    width: 50%;
+}
