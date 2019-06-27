@@ -31,7 +31,8 @@ require_once($CFG->dirroot.'/mod/assign/locallib.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/report/feedbackoverview/index.php');
 $PAGE->set_pagelayout('report');
-$PAGE->set_title('Feedback Overview');
+$PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
+$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
 
 echo $OUTPUT->header();
 
