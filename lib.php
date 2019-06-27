@@ -9,9 +9,9 @@ function get_unit_assignments($units) {
   $unit_ids = substr($unit_ids, 0, -1) . ')';
   $assignments = $DB->get_records_sql(
     "SELECT a.id, cm.id AS 'module', a.course, a.duedate, g.idnumber, g.iteminstance
-     FROM assign a
-     INNER JOIN grade_items g ON a.id = g.iteminstance
-		 INNER JOIN course_modules cm ON a.id = cm.instance
+     FROM {assign} a
+     INNER JOIN {grade_items} g ON a.id = g.iteminstance
+		 INNER JOIN {course_modules} cm ON a.id = cm.instance
      WHERE a.course IN " . $unit_ids . "AND g.itemmodule = 'assign'  AND cm.module = 1"//get assignments from the unit IDs
      );
 		 //to-do: check if course is unit page
