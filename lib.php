@@ -1,6 +1,6 @@
 <?php
 
-function get_unit_assignments($units) {
+function get_unit_assignments($units, $user) {
   global $DB;
   $unit_ids = '(';
   foreach ($units as $unit) {
@@ -12,14 +12,53 @@ function get_unit_assignments($units) {
      FROM {assign} a
      INNER JOIN {grade_items} g ON a.id = g.iteminstance
 		 INNER JOIN {course_modules} cm ON a.id = cm.instance
-     WHERE a.course IN " . $unit_ids . "AND g.itemmodule = 'assign'  AND cm.module = 1"//get assignments from the unit IDs
+     WHERE a.course IN " . $unit_ids . "AND g.itemmodule = 'assign'  AND cm.module = 29"//get assignments from the unit IDs
      );
 		 //to-do: check if course is unit page
 
   return $assignments;
 }
 
-function create_table($units, $assignments, $grading_info) {
+function get_feedback($assignments, $user) {
+  global $DB;
+
+  $assignment_ids = '(';
+  foreach ($assignments as $assignment) {
+    $assignment_ids .= $assignment . ','; //concatenate the unit IDs into a string for the SQL query
+  }
+  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
+
+  $turnitin_feedback = $DB->get_records_sql(
+    "SELECT g.iteminstance AS 'id', p.gm_feedback AS 'feedback'
+     FROM {plagiarism_turnitin_files} p
+     INNER JOIN {course_modules} cm ON p.cm = cm.id
+     INNER JOIN {grade_items} g ON cm.instance = g.iteminstance
+     INNER JOIN {assign} a ON g.iteminstance = a.id
+     WHERE p.userid =" . $user .  " AND cm.module = 29 AND g.iteminstance IN " . $assignment_ids . " AND g.itemmodule = 'assign'");
+
+     return $turnitin_feedback;
+}
+
+function get_feedback_files($assignments, $user) {
+  global $DB;
+
+  $assignment_ids = '(';
+  foreach ($assignments as $assignment) {
+    $assignment_ids .= $assignment . ','; //concatenate the unit IDs into a string for the SQL query
+  }
+  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
+
+  $files = $DB->get_records_sql(
+    "SELECT i.iteminstance AS 'id', f.numfiles
+     FROM mdl_assignfeedback_file f
+     INNER JOIN mdl_grade_grades g ON f.grade = g.itemid
+     INNER JOIN mdl_grade_items i ON g.itemid = i.id
+     WHERE g.userid = " . $user . " AND i.iteminstance IN " . $assignment_ids);
+
+     return $files;
+}
+
+function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files) {
 	global $USER;
 
 	$strassignment = get_string('assignmentname', 'report_feedbackoverview');
@@ -54,16 +93,19 @@ function create_table($units, $assignments, $grading_info) {
 			} else {
 				$cell4 = new html_table_cell(date('d-m-Y, g:i A', ($grades->items[0]->grades[$USER->id]->dategraded))); //else, show the grading date
 			}
-
-			if ($grades->items[0]->locked == true) { //if the assignment has been locked
-				if ($grades->items[0]->grades[$USER->id]->str_feedback == null) { //if there is no feedback
+      if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
+          $cell5 = new html_table_cell('Feedback available on Turnitin');
+        } elseif ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
+          $cell5 = new html_table_cell('Feedback file(s) available');
+        // } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
+				} elseif ($grades->items[0]->grades[$USER->id]->str_feedback == null) { //if there is no feedback
 					$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //this cell should be empty
-				} else {
-					$cell5 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_feedback); //else, show the feedback
-				}
+  			} else {
+  					//$cell5 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_feedback); //else, show the feedback
+  			}
 				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
 				} else {
-					$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //if the assignment is not locked, don't show feedback or grades
+					//$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //if the assignment is not locked, don't show feedback or grades
 					$cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
 				}
 
@@ -72,8 +114,5 @@ function create_table($units, $assignments, $grading_info) {
 			$table->data[] = $row;
 
 		}
+    return $table;
 	}
-
-
-  return $table;
-}

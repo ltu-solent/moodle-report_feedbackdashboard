@@ -35,17 +35,25 @@ $PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
 
 echo $OUTPUT->header();
+$user = $USER->id;
+$units = enrol_get_all_users_courses($user);
 
-$units = enrol_get_all_users_courses($USER->id);
+$assignments = get_unit_assignments($units, $user);
 
-$assignments = get_unit_assignments($units);
+foreach ($assignments as $assignment) {
+  $assignment_ids[] = $assignment->id;
+}
+
+$turnitin_feedback = get_feedback($assignment_ids, $user);
+$feedback_files = get_feedback_files($assignment_ids, $user);
 
 foreach ($units as $unit) { //for each the user's units
   $assignment_count = 0; //keep track of the number of assignments;
   $grading_info = [];
   foreach ($assignments as $assignment) { //go through every assignment in the unit
 
-    if ($assignment->course == $unit->id && $assignment->idnumber != null) { //if the assignment has an idnumber
+    if ($assignment->course == $unit->id) { //if the assignment has an idnumber
+    // if ($assignment->course == $unit->id && $assignment->idnumber != null) {
         $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
         $assignment_count++; //add one to the assignment count
 
@@ -57,7 +65,7 @@ foreach ($units as $unit) { //for each the user's units
   echo html_writer::tag('h3', $unit->fullname);
 
   if ($assignment_count != 0) { //if the unit has assignments...
-      $table = create_table($unit, $assignments, $grading_info); //generate a table containing the assignment information and grades
+      $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files); //generate a table containing the assignment information and grades
       echo html_writer::table($table); //show the table
   } else {
     echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
