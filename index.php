@@ -38,6 +38,12 @@ echo $OUTPUT->header();
 $user = $USER->id;
 $units = enrol_get_all_users_courses($user);
 
+foreach ($units as $unit) {
+  $course_category_ids[] = $unit->category;
+}
+
+$course_category_names = get_course_category_names($course_category_ids);
+
 $assignments = get_unit_assignments($units, $user);
 
 foreach ($assignments as $assignment) {
@@ -48,30 +54,32 @@ $turnitin_feedback = get_feedback($assignment_ids, $user);
 $feedback_files = get_feedback_files($assignment_ids, $user);
 
 foreach ($units as $unit) { //for each the user's units
-  $assignment_count = 0; //keep track of the number of assignments;
-  $grading_info = [];
-  foreach ($assignments as $assignment) { //go through every assignment in the unit
+  if (strpos(strtolower($course_category_names[$unit->category]->name), 'unit pages') !== false) { //check if the course is a unit page
 
-    if ($assignment->course == $unit->id) { //if the assignment has an idnumber
-    // if ($assignment->course == $unit->id && $assignment->idnumber != null) {
-        $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
-        $assignment_count++; //add one to the assignment count
+    $assignment_count = 0; //keep track of the number of assignments;
+    $grading_info = [];
+    foreach ($assignments as $assignment) { //go through every assignment in the unit
+
+      if ($assignment->course == $unit->id && $assignment->hidden == false && $assignment->deletioninprogress == 0) { //if the assignment matches the unit and is not hidden
+      // if ($assignment->course == $unit->id && $assignment->idnumber != null) {
+          $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
+          $assignment_count++; //add one to the assignment count
+
+      }
 
     }
 
+    echo html_writer::start_tag('div', ['class'=>'feedbackoverview_unit']);
+    echo html_writer::tag('h3', $unit->fullname);
+
+    if ($assignment_count != 0) { //if the unit has assignments...
+        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files); //generate a table containing the assignment information and grades
+        echo html_writer::table($table); //show the table
+    } else {
+      echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
+    }
+      echo html_writer::end_tag('div', ['class'=>'feedbackoverview_unit']);
   }
-
-  echo html_writer::start_tag('div', ['class'=>'feedbackoverview_unit']);
-  echo html_writer::tag('h3', $unit->fullname);
-
-  if ($assignment_count != 0) { //if the unit has assignments...
-      $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files); //generate a table containing the assignment information and grades
-      echo html_writer::table($table); //show the table
-  } else {
-    echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
-  }
-    echo html_writer::end_tag('div', ['class'=>'feedbackoverview_unit']);
-
 }
 
 echo $OUTPUT->footer();

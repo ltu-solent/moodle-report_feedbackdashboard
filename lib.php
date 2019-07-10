@@ -1,5 +1,22 @@
 <?php
 
+function get_course_category_names($course_category_ids) {
+  global $DB;
+  $category_ids = '(';
+  foreach ($course_category_ids as $category_id) {
+    $category_ids .= $category_id . ','; //concatenate the unit IDs into a string for the SQL query
+  }
+  $category_ids = substr($category_ids, 0, -1) . ')';
+
+  $course_category_names = $DB->get_records_sql(
+    "SELECT id, name
+     FROM {course_categories}
+     WHERE id IN " . $category_ids
+     );
+
+  return $course_category_names;
+}
+
 function get_unit_assignments($units, $user) {
   global $DB;
   $unit_ids = '(';
@@ -8,7 +25,7 @@ function get_unit_assignments($units, $user) {
   }
   $unit_ids = substr($unit_ids, 0, -1) . ')';
   $assignments = $DB->get_records_sql(
-    "SELECT a.id, cm.id AS 'module', a.course, a.duedate, g.idnumber, g.iteminstance
+    "SELECT a.id, cm.id AS 'module', a.course, a.duedate, g.idnumber, g.iteminstance, g.hidden, cm.deletioninprogress
      FROM {assign} a
      INNER JOIN {grade_items} g ON a.id = g.iteminstance
 		 INNER JOIN {course_modules} cm ON a.id = cm.instance
@@ -83,35 +100,42 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 			if ($grades->items[0]->grades[$USER->id]->datesubmitted == null) { //if the student has not submitted anything yet
 				$cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //cell should say 'Not submitted'
 			} else {
-				$cell2 = new html_table_cell(date('d-m-Y, g:i A', $grades->items[0]->grades[$USER->id]->datesubmitted)); //else, show the submission date
+				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', $grades->items[0]->grades[$USER->id]->datesubmitted)); //else, show the submission date
 			}
-
+      if ($assignments[$grades->items[0]->iteminstance]->duedate !== "0") {
 			$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$grades->items[0]->iteminstance]->duedate)));
-
+      } else {
+      $cell3 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+      }
 			if ($grades->items[0]->grades[$USER->id]->dategraded == null) { //if the assignment has not been graded
 				$cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //cell should be empty
 			} else {
 				$cell4 = new html_table_cell(date('d-m-Y, g:i A', ($grades->items[0]->grades[$USER->id]->dategraded))); //else, show the grading date
 			}
+
+      $cell5 = new html_table_cell('');
+
       if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-          $cell5 = new html_table_cell('Feedback available on Turnitin');
-        } elseif ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-          $cell5 = new html_table_cell('Feedback file(s) available');
-        // } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
-				} elseif ($grades->items[0]->grades[$USER->id]->str_feedback == null) { //if there is no feedback
-					$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //this cell should be empty
-  			} else {
-  					//$cell5 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_feedback); //else, show the feedback
+          $cell5->text .= 'Feedback available on Turnitin';
+      }
+      if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
+          $cell5->text .= 'Feedback file(s) available';
+      } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
+      } elseif ($grades->items[0]->grades[$USER->id]->str_feedback !== '') { //if there is no feedback
+  				$cell5->text .= 'Feedback available on the assignment page'; //else, show the feedback
   			}
 				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
-				} else {
-					//$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //if the assignment is not locked, don't show feedback or grades
-					$cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
-				}
 
-			$row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
+        $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
 
-			$table->data[] = $row;
+        $table->data[] = $row;
+      }
+        // else {
+				// 	$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //if the assignment is not locked, don't show feedback or grades
+				// 	$cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+				// }
+
+
 
 		}
     return $table;
