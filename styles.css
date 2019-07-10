@@ -22,6 +22,6 @@ table#feedbackoverview {
   margin-bottom: 50px;
 }
 
-.feedbackoverview_unit .cell.c4 {
-    width: 50%;
+.feedbackoverview_unit .cell {
+  width: 16.666%;
 }
