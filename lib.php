@@ -116,14 +116,18 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
       $cell5 = new html_table_cell('');
 
       if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-          $cell5->text .= 'Feedback available on Turnitin';
+          $cell5->text .= 'Feedback available on Turnitin<br>';
       }
       if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-          $cell5->text .= 'Feedback file(s) available';
-      } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
-      } elseif ($grades->items[0]->grades[$USER->id]->str_feedback !== '') { //if there is no feedback
-  				$cell5->text .= 'Feedback available on the assignment page'; //else, show the feedback
-  			}
+          $cell5->text .= 'Feedback file(s) available<br>';
+        }
+      // } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
+       if ($grades->items[0]->grades[$USER->id]->str_feedback !== '') {
+  				$cell5->text .= 'Feedback available on the assignment page<br>'; //else, show the feedback
+        }
+       if($cell5->text == "") {
+				     $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+        }
 				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
 
         $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
