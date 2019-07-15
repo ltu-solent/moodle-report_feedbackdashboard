@@ -56,6 +56,24 @@ function get_feedback($assignments, $user) {
      return $turnitin_feedback;
 }
 
+function get_feedback_comments($assignments, $user) {
+  global $DB;
+
+  $assignment_ids = '(';
+  foreach ($assignments as $assignment) {
+    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
+  }
+  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
+
+  $comment = $DB->get_records_sql(
+    "SELECT c.assignment AS 'id', c.commenttext
+     FROM {assignfeedback_comments} c
+     INNER JOIN {assign_grades} g ON c.grade = g.id
+     WHERE g.userid = " . $user . " AND c.assignment IN " . $assignment_ids);
+
+     return $comment;
+}
+
 function get_feedback_files($assignments, $user) {
   global $DB;
 
@@ -66,16 +84,15 @@ function get_feedback_files($assignments, $user) {
   $assignment_ids = substr($assignment_ids, 0, -1) . ')';
 
   $files = $DB->get_records_sql(
-    "SELECT i.iteminstance AS 'id', f.numfiles
-     FROM mdl_assignfeedback_file f
-     INNER JOIN mdl_grade_grades g ON f.grade = g.itemid
-     INNER JOIN mdl_grade_items i ON g.itemid = i.id
-     WHERE g.userid = " . $user . " AND i.iteminstance IN " . $assignment_ids);
+    "SELECT f.assignment AS 'id', f.numfiles
+     FROM {assignfeedback_file} f
+     INNER JOIN {assign_grades} g ON f.grade = g.id
+     WHERE g.userid = " . $user . " AND f.assignment IN " . $assignment_ids);
 
      return $files;
 }
 
-function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files) {
+function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files, $feedback_comments) {
 	global $USER;
 
 	$strassignment = get_string('assignmentname', 'report_feedbackoverview');
@@ -120,7 +137,11 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
       }
       if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
           $cell5->text .= 'Feedback file(s) available<br>';
-        }
+      }
+      if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== "" && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null) {
+          $cell5->text .= 'Feedback comment available<br>';
+      }
+
       // } elseif ($grades->items[0]->locked == true) { //if the assignment has been locked
        if ($grades->items[0]->grades[$USER->id]->str_feedback !== '') {
   				$cell5->text .= 'Feedback available on the assignment page<br>'; //else, show the feedback

@@ -51,6 +51,7 @@ foreach ($assignments as $assignment) {
 }
 
 $turnitin_feedback = get_feedback($assignment_ids, $user);
+$feedback_comments = get_feedback_comments($assignment_ids, $user);
 $feedback_files = get_feedback_files($assignment_ids, $user);
 
 foreach ($units as $unit) { //for each the user's units
@@ -73,7 +74,7 @@ foreach ($units as $unit) { //for each the user's units
     echo html_writer::tag('h3', $unit->fullname);
 
     if ($assignment_count != 0) { //if the unit has assignments...
-        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files); //generate a table containing the assignment information and grades
+        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files, $feedback_comments); //generate a table containing the assignment information and grades
         echo html_writer::table($table); //show the table
     } else {
       echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
