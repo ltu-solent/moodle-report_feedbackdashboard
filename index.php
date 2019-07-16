@@ -51,7 +51,7 @@ foreach ($assignments as $assignment) {
 }
 
 $turnitin_feedback = get_feedback($assignment_ids, $user);
-$feedback_comments = get_feedback_comments($assignment_ids, $user);
+// $feedback_comments = get_feedback_comments($assignment_ids, $user);
 $feedback_files = get_feedback_files($assignment_ids, $user);
 
 foreach ($units as $unit) { //for each the user's units
@@ -61,8 +61,9 @@ foreach ($units as $unit) { //for each the user's units
     $grading_info = [];
     foreach ($assignments as $assignment) { //go through every assignment in the unit
 
-      if ($assignment->course == $unit->id && $assignment->hidden == false && $assignment->deletioninprogress == 0) { //if the assignment matches the unit and is not hidden
-      // if ($assignment->course == $unit->id && $assignment->idnumber != null) {
+      if ($assignment->course == $unit->id && $assignment->hidden == false && $assignment->idnumber != null && $assignment->deletioninprogress == 0) { /*if the assignment
+        belongs to the unit, is not hidden, has an idnumber and is not being deleted*/
+
           $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
           $assignment_count++; //add one to the assignment count
 
@@ -74,7 +75,7 @@ foreach ($units as $unit) { //for each the user's units
     echo html_writer::tag('h3', $unit->fullname);
 
     if ($assignment_count != 0) { //if the unit has assignments...
-        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files, $feedback_comments); //generate a table containing the assignment information and grades
+        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_files); //generate a table containing the assignment information and grades
         echo html_writer::table($table); //show the table
     } else {
       echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
