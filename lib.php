@@ -56,24 +56,6 @@ function get_feedback($assignments, $user) {
      return $turnitin_feedback;
 }
 
-// function get_feedback_comments($assignments, $user) {
-//   global $DB;
-//
-//   $assignment_ids = '(';
-//   foreach ($assignments as $assignment) {
-//     $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
-//   }
-//   $assignment_ids = substr($assignment_ids, 0, -1) . ')';
-//
-//   $comment = $DB->get_records_sql(
-//     "SELECT c.assignment AS 'id', c.commenttext
-//      FROM {assignfeedback_comments} c
-//      INNER JOIN {assign_grades} g ON c.grade = g.id
-//      WHERE g.userid = " . $user . " AND c.assignment IN " . $assignment_ids);
-//
-//      return $comment;
-// }
-
 function get_feedback_files($assignments, $user) {
   global $DB;
 
