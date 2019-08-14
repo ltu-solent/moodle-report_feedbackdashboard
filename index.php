@@ -35,6 +35,9 @@ $PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
 
 echo $OUTPUT->header();
+echo "<h5>All grades available in Solent Online Learning are provisional and subject to change.
+      To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
+      <br>";
 $user = $USER->id;
 $units = enrol_get_all_users_courses($user);
 
@@ -60,8 +63,7 @@ foreach ($units as $unit) { //for each the user's units
     $assignment_count = 0; //keep track of the number of assignments;
     $grading_info = [];
     foreach ($assignments as $assignment) { //go through every assignment in the unit
-
-      if ($assignment->course == $unit->id && $assignment->hidden == false && $assignment->idnumber != null && $assignment->deletioninprogress == 0) { /*if the assignment
+      if ($assignment->course == $unit->id && $assignment->hidden == "0" && $assignment->idnumber != null && $assignment->deletioninprogress == 0) { /*if the assignment
         belongs to the unit, is not hidden, has an idnumber and is not being deleted*/
 
           $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
