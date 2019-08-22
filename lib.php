@@ -118,12 +118,11 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell5 = new html_table_cell("");
 
           if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= 'Feedback available on Turnitin<br>';
+              $cell5->text .= 'Feedback available in Turnitin<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
               $cell5->text .= 'Feedback file(s) available<br>';
           }
-
          if ($grades->items[0]->grades[$USER->id]->str_feedback !== '') {
     				$cell5->text .= 'Feedback available on the assignment page<br>'; //else, show the feedback
           }
