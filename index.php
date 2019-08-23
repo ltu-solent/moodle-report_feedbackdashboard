@@ -35,9 +35,10 @@ $PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
 
 echo $OUTPUT->header();
-echo "<h5>All grades available in Solent Online Learning are provisional and subject to change.
+echo "<h5 id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
       To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
       <br>";
+echo "<button id= 'print_btn' onClick='window.print()'>Print this report</button><br>";
 $user = $USER->id;
 $units = enrol_get_all_users_courses($user);
 

@@ -25,3 +25,25 @@ table#feedbackoverview {
 .feedbackoverview_unit .cell {
   width: 16.666%;
 }
+
+#page-report-feedbackoverview-index #print_btn {
+  float: right;
+}
+
+@media print {
+  #page-report-feedbackoverview-index #page {
+    margin-top: 0 !important;
+  }
+  #page-report-feedbackoverview-index #region-main {
+    padding-top: 0 !important;
+  }
+  #page-report-feedbackoverview-index #disclaimer {
+    display: none;
+  }
+  #page-report-feedbackoverview-index #print_btn {
+    display: none;
+  }
+  #page-report-feedbackoverview-index #page-footer {
+    display: none;
+  }
+}
