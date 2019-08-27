@@ -38,7 +38,6 @@ function get_unit_assignments($units, $user) {
 
 function get_feedback($assignments, $user) {
   global $DB;
-
   $assignment_ids = '(';
   foreach ($assignments as $assignment) {
     $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
@@ -158,7 +157,7 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
               $cell5->text .= 'Feedback file(s) available<br>';
           }
-         if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '') {
+         if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
     				$cell5->text .= 'Feedback available on the assignment page<br>'; //else, show the feedback
           }
 
