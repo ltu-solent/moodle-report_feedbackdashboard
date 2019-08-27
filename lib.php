@@ -152,13 +152,15 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell5 = new html_table_cell("");
 
           if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= 'Feedback available in Turnitin<br>';
+              $cell5->text .= get_string('feedbackturnitin', 'report_feedbackoverview');
+              $cell5->text .= '<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-              $cell5->text .= 'Feedback file(s) available<br>';
+              $cell5->text .= get_string('feedbackfile', 'report_feedbackoverview');
+              $cell5->text .= '<br>';
           }
          if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
-    				$cell5->text .= 'Feedback available on the assignment page<br>'; //else, show the feedback
+    				$cell5->text .= get_string('feedbackcomment', 'report_feedbackoverview'); //else, show the feedback
           }
 
           if($cell5->text == "" || $cell5->text == null) {
