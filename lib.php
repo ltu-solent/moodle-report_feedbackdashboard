@@ -130,10 +130,10 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 
 			$cell1 = new html_table_cell(html_writer::tag('a', $grades->items[0]->name, ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module]));
 
-			if ($submission[$grades->items[0]->iteminstance]->status == "submitted") { //if the student has not submitted anything yet
-				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$grades->items[0]->iteminstance]->timemodified))); //else, show the submission date
+			if ($submission[$grades->items[0]->iteminstance]->status == "submitted") { //if the student has made a submission
+				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$grades->items[0]->iteminstance]->timemodified))); //show the submission date
 			} else {
-        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //cell should say 'Not submitted'
+        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //else, cell should say 'Not submitted'
 			}
       if ($assignments[$grades->items[0]->iteminstance]->duedate !== "0") {
 			$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$grades->items[0]->iteminstance]->duedate)));
