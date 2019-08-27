@@ -92,7 +92,24 @@ function get_feedback_files($assignments, $user) {
      return $files;
 }
 
-function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files) {
+function get_submission_status($assignments, $user) {
+  global $DB;
+
+  $assignment_ids = '(';
+  foreach ($assignments as $assignment) {
+    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
+  }
+  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
+
+  $submission = $DB->get_records_sql(
+    "SELECT assignment, timemodified, status
+     FROM {assign_submission} s
+     WHERE userid = " . $user . " AND assignment IN " . $assignment_ids);
+
+     return $submission;
+}
+
+function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission) {
 	global $USER;
 
 	$strassignment = get_string('assignmentname', 'report_feedbackoverview');
@@ -114,10 +131,10 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 
 			$cell1 = new html_table_cell(html_writer::tag('a', $grades->items[0]->name, ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module]));
 
-			if ($grades->items[0]->grades[$USER->id]->datesubmitted == null) { //if the student has not submitted anything yet
-				$cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //cell should say 'Not submitted'
+			if ($submission[$grades->items[0]->iteminstance]->status == "submitted") { //if the student has not submitted anything yet
+				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$grades->items[0]->iteminstance]->timemodified))); //else, show the submission date
 			} else {
-				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', $grades->items[0]->grades[$USER->id]->datesubmitted)); //else, show the submission date
+        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //cell should say 'Not submitted'
 			}
       if ($assignments[$grades->items[0]->iteminstance]->duedate !== "0") {
 			$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$grades->items[0]->iteminstance]->duedate)));
