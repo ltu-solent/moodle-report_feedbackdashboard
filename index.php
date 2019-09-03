@@ -32,9 +32,21 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/report/feedbackoverview/index.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
+
+if (isloggedin()) {
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
+} else {
+  $PAGE->set_heading(get_string('pluginname', 'report_feedbackoverview'));
+}
 
 echo $OUTPUT->header();
+
+if (!isloggedin()) {
+  echo 'You do not have permission to view this page (please check you are logged in).';
+  echo $OUTPUT->footer();
+  die();
+}
+
 echo "<h5 id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
       To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
       <br>";
