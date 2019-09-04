@@ -33,7 +33,7 @@ $PAGE->set_url('/report/feedbackoverview/index.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
 
-if (isloggedin()) {
+if (isloggedin() && $USER->id != 1) {
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
 } else {
   $PAGE->set_heading(get_string('pluginname', 'report_feedbackoverview'));
@@ -41,7 +41,7 @@ $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string
 
 echo $OUTPUT->header();
 
-if (!isloggedin()) {
+if (!isloggedin() || $USER->id = 1) {
   echo 'You do not have permission to view this page (please check you are logged in).';
   echo $OUTPUT->footer();
   die();
