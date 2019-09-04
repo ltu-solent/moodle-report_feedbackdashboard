@@ -26,6 +26,9 @@
 $string['assignmentname'] = 'Assignment';
 $string['duedate'] = 'Due Date';
 $string['datesubmitted'] = 'Date Submitted';
+$string['disclaimer'] = "<h5 id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
+                            To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
+                            <br>";
 $string['emptycell'] = '-';
 $string['feedback'] = 'Feedback';
 $string['feedbackcomment'] = 'Feedback comment available';
@@ -33,6 +36,8 @@ $string['feedbackfile'] = 'Feedback file(s) available';
 $string['feedbackturnitin'] = 'Feedback available on Tunitin';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
+$string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
 $string['noassignments'] = 'There are currently no assignments for this unit';
 $string['nosubmitteddate'] = 'Not submitted';
 $string['pluginname'] = 'Feedback Overview';
+$string['print'] = 'Print this report';

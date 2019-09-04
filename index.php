@@ -41,16 +41,14 @@ $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string
 
 echo $OUTPUT->header();
 
-if (!isloggedin() || $USER->id = 1) {
-  echo 'You do not have permission to view this page (please check you are logged in).';
+if (!isloggedin() || $USER->id == 1) {
+  echo get_string('loggedout', 'report_feedbackoverview');
   echo $OUTPUT->footer();
   die();
 }
 
-echo "<h5 id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
-      To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
-      <br>";
-echo "<button id= 'print_btn' onClick='window.print()'>Print this report</button><br>";
+echo get_string('disclaimer', 'report_feedbackoverview');
+echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackoverview') . "</button><br>";
 $user = $USER->id;
 $units = enrol_get_all_users_courses($user);
 
