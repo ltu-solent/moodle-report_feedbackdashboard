@@ -45,11 +45,12 @@ function get_turnitin_feedback($assignments, $user) {
   $assignment_ids = substr($assignment_ids, 0, -1) . ')';
 
   $turnitin_feedback = $DB->get_records_sql(
-    "SELECT g.iteminstance AS 'id', p.gm_feedback AS 'feedback', p.externalid
+    "SELECT g.iteminstance AS 'id', p.gm_feedback AS 'feedback', p.externalid, pu.turnitin_uid
      FROM {plagiarism_turnitin_files} p
      INNER JOIN {course_modules} cm ON p.cm = cm.id
      INNER JOIN {grade_items} g ON cm.instance = g.iteminstance
      INNER JOIN {assign} a ON g.iteminstance = a.id
+     INNER JOIN {plagiarism_turnitin_users} pu ON p.userid = pu.userid
      WHERE p.userid =" . $user .  " AND cm.module = 29 AND g.iteminstance IN " . $assignment_ids . " AND g.itemmodule = 'assign'");
 
      return $turnitin_feedback;
@@ -152,8 +153,8 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell5 = new html_table_cell("");
 
           if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= '<a href="https://ev.turnitinuk.com/app/carta/en_us/?o=' . $turnitin_feedback[$grades->items[0]->iteminstance]->externalid .
-                              '&student_user=1">' . get_string('feedbackturnitin', 'report_feedbackoverview') . '</a>';
+              $cell5->text .= '<a href="https://ev.turnitinuk.com/app/carta/en_us/?lang=en_us&s=1&u=' . $turnitin_feedback[$grades->items[0]->iteminstance]->turnitin_uid .
+                              '&o=' . $turnitin_feedback[$grades->items[0]->iteminstance]->externalid . '">' . get_string('feedbackturnitin', 'report_feedbackoverview') . '</a>';
               $cell5->text .= '<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
