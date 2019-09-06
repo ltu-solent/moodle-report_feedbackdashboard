@@ -36,7 +36,7 @@ function get_unit_assignments($units, $user) {
   return $assignments;
 }
 
-function get_feedback($assignments, $user) {
+function get_turnitin_feedback($assignments, $user) {
   global $DB;
   $assignment_ids = '(';
   foreach ($assignments as $assignment) {

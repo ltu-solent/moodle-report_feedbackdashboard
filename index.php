@@ -64,7 +64,7 @@ foreach ($assignments as $assignment) {
   $assignment_ids[] = $assignment->id;
 }
 
-$turnitin_feedback = get_feedback($assignment_ids, $user);
+$turnitin_feedback = get_turnitin_feedback($assignment_ids, $user);
 $feedback_comments = get_feedback_comments($assignment_ids, $user);
 $feedback_files = get_feedback_files($assignment_ids, $user);
 $submission = get_submission_status($assignment_ids, $user);
