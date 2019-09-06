@@ -30,10 +30,10 @@ $string['disclaimer'] = "<h5 id='disclaimer'>All grades available in Solent Onli
                             To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
                             <br>";
 $string['emptycell'] = '-';
-$string['feedback'] = 'Feedback';
+$string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment available';
 $string['feedbackfile'] = 'Feedback file(s) available';
-$string['feedbackturnitin'] = 'Feedback available on Tunitin';
+$string['feedbackturnitin'] = 'Feedback available on Turnitin';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
