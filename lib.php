@@ -158,11 +158,11 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
               $cell5->text .= '<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-              $cell5->text .= get_string('feedbackfile', 'report_feedbackoverview');
+              $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
               $cell5->text .= '<br>';
           }
          if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
-    				$cell5->text .= get_string('feedbackcomment', 'report_feedbackoverview'); //else, show the feedback
+    				$cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
           }
 
           if($cell5->text == "" || $cell5->text == null) {
