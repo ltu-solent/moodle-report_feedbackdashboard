@@ -153,8 +153,7 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell5 = new html_table_cell("");
 
           if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= '<a href="https://ev.turnitinuk.com/app/carta/en_us/?lang=en_us&s=1&u=' . $turnitin_feedback[$grades->items[0]->iteminstance]->turnitin_uid .
-                              '&o=' . $turnitin_feedback[$grades->items[0]->iteminstance]->externalid . '">' . get_string('feedbackturnitin', 'report_feedbackoverview') . '</a>';
+              $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
               $cell5->text .= '<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
