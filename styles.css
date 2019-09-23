@@ -46,9 +46,6 @@ table#feedbackoverview {
   #page-report-feedbackoverview-index #region-main {
     padding-top: 0 !important;
   }
-  #page-report-feedbackoverview-index #disclaimer {
-    display: none;
-  }
   #page-report-feedbackoverview-index #print_btn {
     display: none;
   }
