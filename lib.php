@@ -150,23 +150,32 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell4 = new html_table_cell(date('d-m-Y, g:i A', ($grades->items[0]->grades[$USER->id]->dategraded))); //else, show the grading date
         }
 
-          $cell5 = new html_table_cell("");
+        if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1" ||
+           ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") ||
+            $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null) {
+                $cell5 = new html_table_cell("Feedback available:");
+                $cell5->text .= '<br>';
+                $cell5->text .= '<ul>';
 
-          if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
-              $cell5->text .= '<br>';
-          }
-         if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-              $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
-              $cell5->text .= '<br>';
-          }
-         if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
-    				$cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
-          }
-
-          if($cell5->text == "" || $cell5->text == null) {
+                if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
+                    $cell5->text .= '<li>';
+                    $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
+                    $cell5->text .= '</li>';
+                }
+               if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
+                    $cell5->text .= '<li>';
+                    $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
+                    $cell5->text .= '</li>';
+                }
+               if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
+                  $cell5->text .= '<li>';
+                  $cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
+                  $cell5->text .= '</li>';
+                }
+                $cell5->text .= '</ul>';
+            } else {
                 $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
-           }
+            }
 
 				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
       } else {

@@ -31,9 +31,9 @@ $string['disclaimer'] = "<h5 id='disclaimer'>All grades available in Solent Onli
                             <br>";
 $string['emptycell'] = '-';
 $string['feedback'] = 'View Feedback';
-$string['feedbackcomment'] = 'Feedback comment available';
-$string['feedbackfile'] = 'Feedback file(s) available';
-$string['feedbackturnitin'] = 'Feedback available on Turnitin';
+$string['feedbackcomment'] = 'Feedback comment';
+$string['feedbackfile'] = 'Feedback file(s)';
+$string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
