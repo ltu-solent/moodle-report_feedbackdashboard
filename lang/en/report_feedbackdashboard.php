@@ -18,7 +18,7 @@
  * Strings
  *
  * @package    report
- * @subpackage feedbackoverview
+ * @subpackage feedbackdashboard
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,5 +39,5 @@ $string['gradeddate'] = 'Date Graded';
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
 $string['noassignments'] = 'There are currently no assignments for this unit';
 $string['nosubmitteddate'] = 'Not submitted';
-$string['pluginname'] = 'Feedback Overview';
+$string['pluginname'] = 'Feedback Dashboard';
 $string['print'] = 'Print this report';

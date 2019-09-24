@@ -18,7 +18,7 @@
  * Display a user grade report for all courses
  *
  * @package    report
- * @subpackage feedbackoverview
+ * @subpackage feedbackdashboard
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,26 +29,26 @@ require('lib.php');
 require_once($CFG->dirroot.'/mod/assign/locallib.php');
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/report/feedbackoverview/index.php');
+$PAGE->set_url('/report/feedbackdashboard/index.php');
 $PAGE->set_pagelayout('report');
-$PAGE->set_title(get_string('pluginname', 'report_feedbackoverview'));
+$PAGE->set_title(get_string('pluginname', 'report_feedbackdashboard'));
 
 if (isloggedin() && $USER->id != 1) {
-$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackoverview'));
+$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
 } else {
-  $PAGE->set_heading(get_string('pluginname', 'report_feedbackoverview'));
+  $PAGE->set_heading(get_string('pluginname', 'report_feedbackdashboard'));
 }
 
 echo $OUTPUT->header();
 
 if (!isloggedin() || $USER->id == 1) {
-  echo get_string('loggedout', 'report_feedbackoverview');
+  echo get_string('loggedout', 'report_feedbackdashboard');
   echo $OUTPUT->footer();
   die();
 }
 
-echo get_string('disclaimer', 'report_feedbackoverview');
-echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackoverview') . "</button><br>";
+echo get_string('disclaimer', 'report_feedbackdashboard');
+echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
 $user = $USER->id;
 $units = enrol_get_all_users_courses($user);
 
@@ -85,16 +85,16 @@ foreach ($units as $unit) { //for each the user's units
 
     }
 
-    echo html_writer::start_tag('div', ['class'=>'feedbackoverview_unit']);
+    echo html_writer::start_tag('div', ['class'=>'feedbackdashboard_unit']);
     echo html_writer::tag('h3', $unit->fullname);
 
     if ($assignment_count != 0) { //if the unit has assignments...
         $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission); //generate a table containing the assignment information and grades
         echo html_writer::table($table); //show the table
     } else {
-      echo html_writer::tag('p', get_string('noassignments', 'report_feedbackoverview'));
+      echo html_writer::tag('p', get_string('noassignments', 'report_feedbackdashboard'));
     }
-      echo html_writer::end_tag('div', ['class'=>'feedbackoverview_unit']);
+      echo html_writer::end_tag('div', ['class'=>'feedbackdashboard_unit']);
   }
 }
 

@@ -1,55 +1,55 @@
 @media (max-width: 480px) {
-  #page-report-feedbackoverview-index .mr-auto {
+  #page-report-feedbackdashboard-index .mr-auto {
     display: block;
   }
-  #page-report-feedbackoverview-index .page-header-headings h1 {
+  #page-report-feedbackdashboard-index .page-header-headings h1 {
     font-size: 30px;
   }
 }
 
-table#feedbackoverview {
+table#feedbackdashboard {
     width: 100%;
 }
 
-#feedbackoverview table, p{
+#feedbackdashboard table, p{
   font-size: 15px
 }
 
-#feedbackoverview th{
+#feedbackdashboard th{
   text-align: left;
 }
 
-#feedbackoverview th, td{
+#feedbackdashboard th, td{
   padding: 5px;
 }
 
-#feedbackoverview td{
+#feedbackdashboard td{
   border-bottom: 1px solid #eee;
 }
 
-.feedbackoverview_unit {
+.feedbackdashboard_unit {
   margin-bottom: 50px;
 }
 
-.feedbackoverview_unit .cell {
+.feedbackdashboard_unit .cell {
   width: 16.666%;
 }
 
-#page-report-feedbackoverview-index #print_btn {
+#page-report-feedbackdashboard-index #print_btn {
   float: right;
 }
 
 @media print {
-  #page-report-feedbackoverview-index #page {
+  #page-report-feedbackdashboard-index #page {
     margin-top: 0 !important;
   }
-  #page-report-feedbackoverview-index #region-main {
+  #page-report-feedbackdashboard-index #region-main {
     padding-top: 0 !important;
   }
-  #page-report-feedbackoverview-index #print_btn {
+  #page-report-feedbackdashboard-index #print_btn {
     display: none;
   }
-  #page-report-feedbackoverview-index #page-footer {
+  #page-report-feedbackdashboard-index #page-footer {
     display: none;
   }
 }

@@ -112,16 +112,16 @@ function get_submission_status($assignments, $user) {
 function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission) {
 	global $USER;
 
-	$strassignment = get_string('assignmentname', 'report_feedbackoverview');
-	$strfeedback = get_string('feedback', 'report_feedbackoverview');
-	$strgrade = get_string('grade', 'report_feedbackoverview');
-	$strgradeddate = get_string('gradeddate', 'report_feedbackoverview');
-	$strdatesubmitted = get_string('datesubmitted', 'report_feedbackoverview');
-	$strduedate = get_string('duedate', 'report_feedbackoverview');
+	$strassignment = get_string('assignmentname', 'report_feedbackdashboard');
+	$strfeedback = get_string('feedback', 'report_feedbackdashboard');
+	$strgrade = get_string('grade', 'report_feedbackdashboard');
+	$strgradeddate = get_string('gradeddate', 'report_feedbackdashboard');
+	$strdatesubmitted = get_string('datesubmitted', 'report_feedbackdashboard');
+	$strduedate = get_string('duedate', 'report_feedbackdashboard');
 
 	$table = new html_table();
 	$table->attributes['class'] = 'generaltable boxaligncenter';
-	$table->id = 'feedbackoverview';
+	$table->id = 'feedbackdashboard';
 	$table->cellpadding = 5;
 	$table->head = array($strassignment, $strdatesubmitted, $strduedate, $strgradeddate, $strfeedback, $strgrade);
 
@@ -134,18 +134,18 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 			if ($submission[$grades->items[0]->iteminstance]->status == "submitted") { //if the student has made a submission
 				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$grades->items[0]->iteminstance]->timemodified))); //show the submission date
 			} else {
-        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackoverview')); //else, cell should say 'Not submitted'
+        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackdashboard')); //else, cell should say 'Not submitted'
 			}
       if ($assignments[$grades->items[0]->iteminstance]->duedate !== "0") {
 			$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$grades->items[0]->iteminstance]->duedate)));
       } else {
-      $cell3 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+      $cell3 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
       }
 
       if ($grades->items[0]->locked == true) {
 
         if ($grades->items[0]->grades[$USER->id]->dategraded == null) { //if the assignment has not been graded
-          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //cell should be empty
+          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //cell should be empty
         } else {
           $cell4 = new html_table_cell(date('d-m-Y, g:i A', ($grades->items[0]->grades[$USER->id]->dategraded))); //else, show the grading date
         }
@@ -153,26 +153,26 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
           $cell5 = new html_table_cell("");
 
           if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-              $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
+              $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
               $cell5->text .= '<br>';
           }
          if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-              $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
+              $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
               $cell5->text .= '<br>';
           }
          if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
-    				$cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackoverview'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
+    				$cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
           }
 
           if($cell5->text == "" || $cell5->text == null) {
-                $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+                $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
            }
 
 				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
       } else {
-          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
-          $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview')); //if the assignment is not locked, don't show feedback or grades
-          $cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackoverview'));
+          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
+          $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //if the assignment is not locked, don't show feedback or grades
+          $cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
         }
         $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
 
