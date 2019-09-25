@@ -26,12 +26,13 @@
 $string['assignmentname'] = 'Assignment';
 $string['duedate'] = 'Due Date';
 $string['datesubmitted'] = 'Date Submitted';
-$string['disclaimer'] = "<h5 id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
-                            To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></h5>
+$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change.
+                            To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></p>
                             <br>";
 $string['emptycell'] = '-';
 $string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment';
+$string['feedbackdashboard'] = 'Feedback dashboard';
 $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';

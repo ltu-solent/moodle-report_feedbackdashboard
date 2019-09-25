@@ -153,8 +153,7 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
         if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1" ||
            ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") ||
             $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null) {
-                $cell5 = new html_table_cell("Feedback available:");
-                $cell5->text .= '<br>';
+                $cell5 = new html_table_cell();
                 $cell5->text .= '<ul>';
 
                 if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
