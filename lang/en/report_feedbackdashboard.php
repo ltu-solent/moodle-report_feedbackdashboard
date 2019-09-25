@@ -37,6 +37,8 @@ $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
+$string['instructions'] = '<p>Here you will find all of your units and assignments. Once feedback is released, you will be able to
+                          see your grades and links to your feedback.</p>';
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
 $string['noassignments'] = 'There are currently no assignments for this unit';
 $string['nosubmitteddate'] = 'Not submitted';

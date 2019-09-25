@@ -47,6 +47,8 @@ if (!isloggedin() || $USER->id == 1) {
   die();
 }
 
+echo get_string('instructions', 'report_feedbackdashboard');
+echo '<br>';
 echo get_string('disclaimer', 'report_feedbackdashboard');
 echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
 $user = $USER->id;
