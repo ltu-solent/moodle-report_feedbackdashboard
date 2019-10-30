@@ -52,7 +52,7 @@ echo '<br>';
 echo get_string('disclaimer', 'report_feedbackdashboard');
 echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
 $user = $USER->id;
-$units = enrol_get_all_users_courses($user);
+$units = enrol_get_all_users_courses($user, 1, 'enddate', 'enddate DESC');
 
 foreach ($units as $unit) {
   $course_category_ids[] = $unit->category;
@@ -89,6 +89,7 @@ foreach ($units as $unit) { //for each the user's units
 
     echo html_writer::start_tag('div', ['class'=>'feedbackdashboard_unit']);
     echo html_writer::tag('h3', $unit->fullname);
+	echo html_writer::tag('p', date('d/m/Y', $unit->startdate) . ' - ' . date( "d/m/Y", $unit->enddate));
 
     if ($assignment_count != 0) { //if the unit has assignments...
         $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission); //generate a table containing the assignment information and grades
