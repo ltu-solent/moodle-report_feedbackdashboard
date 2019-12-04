@@ -30,6 +30,7 @@ $string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Onlin
                             To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></p>
                             <br>";
 $string['emptycell'] = '-';
+$string['eventfeedbackdashboardreportviewed'] = 'Feedback dashboard viewed';
 $string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment';
 $string['feedbackdashboard'] = 'Feedback dashboard';
@@ -37,8 +38,15 @@ $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
-$string['instructions'] = '<p>Here you will find all of your units and assignments. Once feedback is released, you will be able to
-                          see your grades and links to your feedback.</p>';
+$string['instructions'] = '<p>This is an overview of where to find your feedback for all summative assignments across all your units.</p><p>
+Links will become available to grades and feedback locations after feedback has been released by the unit leader.
+Feedback could be in the form of feedback comments, feedback files or comments in Turnitin (click the blue pencil to view).</p>
+<p>To get the most out of your feedback:
+<ul>
+<li>Read your feedback</li>
+<li>Look for common themes around improvement in the comments</li>
+<li>Find support to develop areas for improvement in <a href="https://learn.solent.ac.uk/succeed" target="_blank">Succeed@Solent</a></li>
+<li><a href="https://learn.solent.ac.uk/course/view.php?id=31636&section=3" target="_blank">Create a plan</a> for how to improve further assessments</li></ul></p>';
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
 $string['noassignments'] = 'There are currently no assignments for this unit';
 $string['nosubmitteddate'] = 'Not submitted';

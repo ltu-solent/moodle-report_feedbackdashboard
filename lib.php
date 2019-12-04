@@ -17,19 +17,19 @@ function get_course_category_names($course_category_ids) {
   return $course_category_names;
 }
 
-function get_unit_assignments($units, $user) {
+function get_unit_assignments($courses, $user) {
   global $DB;
-  $unit_ids = '(';
-  foreach ($units as $unit) {
-    $unit_ids .= $unit->id . ','; //concatenate the unit IDs into a string for the SQL query
+  $course_ids = '(';
+  foreach ($courses as $course) {
+    $course_ids .= $course->id . ','; //concatenate the unit IDs into a string for the SQL query
   }
-  $unit_ids = substr($unit_ids, 0, -1) . ')';
+  $course_ids = substr($course_ids, 0, -1) . ')';
   $assignments = $DB->get_records_sql(
     "SELECT a.id, cm.id AS 'module', a.course, a.duedate, g.idnumber, g.iteminstance, g.hidden, cm.deletioninprogress
      FROM {assign} a
      INNER JOIN {grade_items} g ON a.id = g.iteminstance
 		 INNER JOIN {course_modules} cm ON a.id = cm.instance
-     WHERE a.course IN " . $unit_ids . "AND g.itemmodule = 'assign'  AND cm.module = 29"//get assignments from the unit IDs
+     WHERE a.course IN " . $course_ids . "AND g.itemmodule = 'assign'  AND cm.module = 29"//get assignments from the unit IDs
      );
 		 //to-do: check if course is unit page
 
