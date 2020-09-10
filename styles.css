@@ -11,9 +11,9 @@ table#feedbackdashboard {
     width: 100%;
 }
 
-#feedbackdashboard table, p{
-  font-size: 15px
-}
+/* #feedbackdashboard table, p{ */
+  /* font-size: 15px */
+/* } */
 
 #feedbackdashboard th{
   text-align: left;
