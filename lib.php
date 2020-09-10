@@ -193,3 +193,15 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 		}
     return $table;
 	}
+
+function report_feedbackdashboard_extend_navigation(global_navigation $navigation){
+    $url = new moodle_url('/report/log/index.php', array('id'=>$course->id));
+    $navigation->add(get_string('pluginname', 'report_feedbackdashboard'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+}
+
+// function report_log_extend_navigation_course($navigation, $course, $context) {
+//     if (has_capability('report/log:view', $context)) {
+//         $url = new moodle_url('/report/log/index.php', array('id'=>$course->id));
+//         $navigation->add(get_string('pluginname', 'report_log'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+//     }
+// }
