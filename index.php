@@ -85,7 +85,7 @@ $feedback_files = get_feedback_files($assignment_ids, $user);
 $submission = get_submission_status($assignment_ids, $user);
 
 foreach ($courses as $course) { //for each the user's units
-  if (strpos(strtolower($course_category_names[$course->category]->name), 'unit pages') !== false) { //check if the course is a unit page
+  if (strpos(strtolower($course_category_names[$course->category]->name), 'module pages') !== false) { //check if the course is a unit page
 
     $assignment_count = 0; //keep track of the number of assignments;
     $grading_info = [];
