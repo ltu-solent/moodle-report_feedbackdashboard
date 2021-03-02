@@ -1,116 +1,80 @@
 <?php
 
-function get_course_category_names($course_category_ids) {
-  global $DB;
-  $category_ids = '(';
-  foreach ($course_category_ids as $category_id) {
-    $category_ids .= $category_id . ','; //concatenate the unit IDs into a string for the SQL query
-  }
-  $category_ids = substr($category_ids, 0, -1) . ')';
+function get_assignments($courses){
+	global $DB;
+	
+	$courseids = null;
+	foreach ($courses as $course) {
+	  $context = context_course::instance($course->id);
+	  if(has_capability('mod/assign:submit', $context)){
+		$courseids .= $course->id . ',';
+	  }
+	}
 
-  $course_category_names = $DB->get_records_sql(
-    "SELECT id, name
-     FROM {course_categories}
-     WHERE id IN " . $category_ids
-     );
+	$courseids = rtrim($courseids, ",");	
 
-  return $course_category_names;
+	$assignments = $DB->get_records_sql("SELECT FLOOR( 1 + RAND( ) *5000 ) id, a.id, cm.id AS cm, a.course, 
+											a.duedate, c.fullname, c.shortname, cm.instance , cm.idnumber, cm.visible, cm.deletioninprogress
+										FROM {course} c 
+										JOIN {course_categories} cc ON cc.id = c.category
+										LEFT JOIN {assign} a ON c.id = a.course								
+										JOIN {course_modules} cm ON a.id = cm.instance AND cm.idnumber != ''
+										JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
+										WHERE c.id IN (" . $courseids . ")  
+										AND cc.idnumber LIKE 'modules_%'
+										AND cm.visible = 1");
+
+	return $assignments;
 }
 
-function get_unit_assignments($courses, $user) {
-  global $DB;
-  $course_ids = '(';
-  foreach ($courses as $course) {
-    $course_ids .= $course->id . ','; //concatenate the unit IDs into a string for the SQL query
-  }
-  $course_ids = substr($course_ids, 0, -1) . ')';
-  $assignments = $DB->get_records_sql(
-    "SELECT a.id, cm.id AS 'module', a.course, a.duedate, g.idnumber, g.iteminstance, g.hidden, cm.deletioninprogress
-     FROM {assign} a
-     INNER JOIN {grade_items} g ON a.id = g.iteminstance
-		 INNER JOIN {course_modules} cm ON a.id = cm.instance
-     WHERE a.course IN " . $course_ids . "AND g.itemmodule = 'assign'  AND cm.module = 29"//get assignments from the unit IDs
-     );
-		 //to-do: check if course is unit page
+function get_turnitin_feedback($assignmentids) {	
+	global $DB, $USER;
 
-  return $assignments;
+	$turnitinfeedback = $DB->get_records_sql("SELECT g.iteminstance AS 'id', p.gm_feedback AS 'feedback', p.externalid, pu.turnitin_uid
+											FROM {plagiarism_turnitin_files} p
+											INNER JOIN {course_modules} cm ON p.cm = cm.id
+											JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
+											INNER JOIN {grade_items} g ON cm.instance = g.iteminstance
+											INNER JOIN {assign} a ON g.iteminstance = a.id
+											INNER JOIN {plagiarism_turnitin_users} pu ON p.userid = pu.userid
+											WHERE p.userid =" . $USER->id .  " 
+											AND g.iteminstance IN (" . $assignmentids . ")");
+    return $turnitinfeedback;
 }
 
-function get_turnitin_feedback($assignments, $user) {
-  global $DB;
-  $assignment_ids = '(';
-  foreach ($assignments as $assignment) {
-    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
-  }
-  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
+function get_feedback_comments($assignmentids) {
+	global $DB, $USER;
 
-  $turnitin_feedback = $DB->get_records_sql(
-    "SELECT g.iteminstance AS 'id', p.gm_feedback AS 'feedback', p.externalid, pu.turnitin_uid
-     FROM {plagiarism_turnitin_files} p
-     INNER JOIN {course_modules} cm ON p.cm = cm.id
-     INNER JOIN {grade_items} g ON cm.instance = g.iteminstance
-     INNER JOIN {assign} a ON g.iteminstance = a.id
-     INNER JOIN {plagiarism_turnitin_users} pu ON p.userid = pu.userid
-     WHERE p.userid =" . $user .  " AND cm.module = 29 AND g.iteminstance IN " . $assignment_ids . " AND g.itemmodule = 'assign'");
-
-     return $turnitin_feedback;
+	$comment = $DB->get_records_sql("SELECT c.assignment AS 'id', c.commenttext
+									FROM {assignfeedback_comments} c
+									INNER JOIN {assign_grades} g ON c.grade = g.id
+									WHERE g.userid = " . $USER->id . " 
+									AND c.assignment IN (" . $assignmentids .")");
+    return $comment;
 }
 
-function get_feedback_comments($assignments, $user) {
-  global $DB;
+function get_feedback_files($assignmentids) {
+	global $DB, $USER;
 
-  $assignment_ids = '(';
-  foreach ($assignments as $assignment) {
-    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
-  }
-  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
-
-  $comment = $DB->get_records_sql(
-    "SELECT c.assignment AS 'id', c.commenttext
-     FROM {assignfeedback_comments} c
-     INNER JOIN {assign_grades} g ON c.grade = g.id
-     WHERE g.userid = " . $user . " AND c.assignment IN " . $assignment_ids);
-
-     return $comment;
+	$files = $DB->get_records_sql("SELECT f.assignment AS 'id', f.numfiles
+									FROM {assignfeedback_file} f
+									INNER JOIN {assign_grades} g ON f.grade = g.id
+									WHERE g.userid = " . $USER->id . " 
+									AND f.assignment IN (" . $assignmentids.")");
+	return $files;
 }
 
-function get_feedback_files($assignments, $user) {
-  global $DB;
+function get_submission_status($assignmentids) {
+	global $DB, $USER;
 
-  $assignment_ids = '(';
-  foreach ($assignments as $assignment) {
-    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
-  }
-  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
-
-  $files = $DB->get_records_sql(
-    "SELECT f.assignment AS 'id', f.numfiles
-     FROM {assignfeedback_file} f
-     INNER JOIN {assign_grades} g ON f.grade = g.id
-     WHERE g.userid = " . $user . " AND f.assignment IN " . $assignment_ids);
-
-     return $files;
+	$submission = $DB->get_records_sql("SELECT assignment, timemodified, status
+										FROM {assign_submission} s
+										WHERE userid = " . $USER->id . " AND assignment IN (" . $assignmentids.")");
+	return $submission;
 }
 
-function get_submission_status($assignments, $user) {
-  global $DB;
-
-  $assignment_ids = '(';
-  foreach ($assignments as $assignment) {
-    $assignment_ids .= $assignment . ','; //concatenate the assignment IDs into a string for the SQL query
-  }
-  $assignment_ids = substr($assignment_ids, 0, -1) . ')';
-
-  $submission = $DB->get_records_sql(
-    "SELECT assignment, timemodified, status
-     FROM {assign_submission} s
-     WHERE userid = " . $user . " AND assignment IN " . $assignment_ids);
-
-     return $submission;
-}
-
-function create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission) {
-	global $USER;
+function create_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission) {
+	global $CFG, $USER;
 
 	$strassignment = get_string('assignmentname', 'report_feedbackdashboard');
 	$strfeedback = get_string('feedback', 'report_feedbackdashboard');
@@ -124,84 +88,83 @@ function create_table($assignments, $grading_info, $turnitin_feedback, $feedback
 	$table->id = 'feedbackdashboard';
 	$table->cellpadding = 5;
 	$table->head = array($strassignment, $strdatesubmitted, $strduedate, $strgradeddate, $strfeedback, $strgrade);
+	
+	$gradinginfo = null;
+	
+	foreach ($assignments as $assignment) {
 
-	foreach ($grading_info as $grades) {
-		if ($grades->items[0]->hidden == false) { //if the assignment is not hidden
-			$row = new html_table_row();
+		if($assignment->course == $course->id){
+		  $gradinginfo = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->instance, $USER->id); //get the grade information for the user
+		  
+		  	foreach ($gradinginfo as $grades) {
 
-			$cell1 = new html_table_cell(html_writer::tag('a', $grades->items[0]->name, ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module]));
+				foreach($grades as $g=>$v ){
+					$row = new html_table_row();
 
-			if ($submission[$grades->items[0]->iteminstance]->status == "submitted") { //if the student has made a submission
-				$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$grades->items[0]->iteminstance]->timemodified))); //show the submission date
-			} else {
-        $cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackdashboard')); //else, cell should say 'Not submitted'
-			}
-      if ($assignments[$grades->items[0]->iteminstance]->duedate !== "0") {
-			$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$grades->items[0]->iteminstance]->duedate)));
-      } else {
-      $cell3 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
-      }
+					$cell1 = new html_table_cell(html_writer::tag('a', $v->name, ['href'=>$CFG->wwwroot . '/mod/assign/view.php?id=' . $assignments[$v->iteminstance]->cm ]));
 
-      if ($grades->items[0]->locked == true) {
+					if ($submission[$v->iteminstance]->status == "submitted") { //if the student has made a submission
+						$cell2 = new html_table_cell(date('d-m-Y, g:i:s A', ($submission[$v->iteminstance]->timemodified))); //show the submission date
+					} else {
+						$cell2 = new html_table_cell(get_string('nosubmitteddate', 'report_feedbackdashboard')); //else, cell should say 'Not submitted'
+					}
+					if ($assignments[$v->iteminstance]->duedate !== "0") {
+						$cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignments[$v->iteminstance]->duedate)));
+					} else {
+						$cell3 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
+					}
 
-        if ($grades->items[0]->grades[$USER->id]->dategraded == null) { //if the assignment has not been graded
-          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //cell should be empty
-        } else {
-          $cell4 = new html_table_cell(date('d-m-Y, g:i A', ($grades->items[0]->grades[$USER->id]->dategraded))); //else, show the grading date
-        }
+					if ($v->locked == true) {
 
-        if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1" ||
-           ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") ||
-            $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null) {
-                $cell5 = new html_table_cell();
-                $cell5->text .= '<ul>';
+						if ($v->grades[$USER->id]->dategraded == null) { //if the assignment has not been graded
+							$cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //cell should be empty
+						} else {
+							$cell4 = new html_table_cell(date('d-m-Y, g:i A', ($v->grades[$USER->id]->dategraded))); //else, show the grading date
+						}
 
-                if ($turnitin_feedback[$grades->items[0]->iteminstance]->feedback == "1") {
-                    $cell5->text .= '<li>';
-                    $cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#submission_status']);
-                    $cell5->text .= '</li>';
-                }
-               if ($feedback_files[$grades->items[0]->iteminstance]->numfiles !== null && $feedback_files[$grades->items[0]->iteminstance]->numfiles !== "0") {
-                    $cell5->text .= '<li>';
-                    $cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);
-                    $cell5->text .= '</li>';
-                }
-               if ($feedback_comments[$grades->items[0]->iteminstance]->commenttext !== '' && $feedback_comments[$grades->items[0]->iteminstance]->commenttext !== null ) {
-                  $cell5->text .= '<li>';
-                  $cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackdashboard'), ['href'=>'/mod/assign/view.php?id=' . $assignments[$grades->items[0]->iteminstance]->module . '#feedback']);//else, show the feedback
-                  $cell5->text .= '</li>';
-                }
-                $cell5->text .= '</ul>';
-            } else {
-                $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
-            }
+						$cell5 = new html_table_cell();
+						$cell5->text .= '<ul>';
 
-				$cell6 = new html_table_cell($grades->items[0]->grades[$USER->id]->str_grade); //show the grade
-      } else {
-          $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
-          $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //if the assignment is not locked, don't show feedback or grades
-          $cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
-        }
-        $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
+						if(isset($turnitinfeedback) && ($turnitinfeedback[$v->iteminstance]->feedback == "1")) {
+							$cell5->text .= '<li>';
+							$cell5->text .= html_writer::tag('a', get_string('feedbackturnitin', 'report_feedbackdashboard'), ['href'=>$CFG->wwwroot . '/mod/assign/view.php?id=' . $assignments[$v->iteminstance]->cm . '#submissionstatus']);
+							$cell5->text .= '</li>';
+						}
+						   
+						if(isset($feedbackfiles[$v->iteminstance]) && ($feedbackfiles[$v->iteminstance]->numfiles !== null && $feedbackfiles[$v->iteminstance]->numfiles !== "0")) {
+							$cell5->text .= '<li>';
+							$cell5->text .= html_writer::tag('a', get_string('feedbackfile', 'report_feedbackdashboard'), ['href'=>$CFG->wwwroot . '/mod/assign/view.php?id=' . $assignments[$v->iteminstance]->cm . '#feedback']);
+							$cell5->text .= '</li>';
+						}
+					   
+						if (isset($feedbackcomments[$v->iteminstance]) && ($feedbackcomments[$v->iteminstance]->commenttext !== '' && $feedbackcomments[$v->iteminstance]->commenttext !== null )) {
+						  $cell5->text .= '<li>';
+						  $cell5->text .= html_writer::tag('a', get_string('feedbackcomment', 'report_feedbackdashboard'), ['href'=>$CFG->wwwroot . '/mod/assign/view.php?id=' . $assignments[$v->iteminstance]->cm . '#feedback']);//else, show the feedback
+						  $cell5->text .= '</li>';
+						}
+						
+						else{
+							$cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
+						}
+						$cell5->text .= '</ul>';
+						
+						$cell6 = new html_table_cell($v->grades[$USER->id]->str_grade); //show the grade
+						
+					} else {
+					  $cell4 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
+					  $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard')); //if the assignment is not locked, don't show feedback or grades
+					  $cell6 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
+					}	
+			
+					$row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
 
-        $table->data[] = $row;
-      }
-
-
-
-
+					$table->data[] = $row;
+				}
+			}	
+		}else{
+			//echo "No assignments";
 		}
-    return $table;
 	}
 
-function report_feedbackdashboard_extend_navigation(global_navigation $navigation){
-    $url = new moodle_url('/report/log/index.php', array('id'=>$course->id));
-    $navigation->add(get_string('pluginname', 'report_feedbackdashboard'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+    return $table;
 }
-
-// function report_log_extend_navigation_course($navigation, $course, $context) {
-//     if (has_capability('report/log:view', $context)) {
-//         $url = new moodle_url('/report/log/index.php', array('id'=>$course->id));
-//         $navigation->add(get_string('pluginname', 'report_log'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
-//     }
-// }

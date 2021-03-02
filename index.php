@@ -22,16 +22,19 @@
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-global $PAGE, $USER,$COURSE;
+global $PAGE, $USER, $COURSE;
 
 require('../../config.php');
 require('lib.php');
 require_once($CFG->dirroot.'/mod/assign/locallib.php');
 
+require_login(true);
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/report/feedbackdashboard/index.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('pluginname', 'report_feedbackdashboard'));
+$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
 
 // Trigger an grade report viewed event.
 $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create(array(
@@ -43,75 +46,36 @@ $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create
           ));
 $event->trigger();
 
-if (isloggedin() && $USER->id != 1) {
-$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
-} else {
-  $PAGE->set_heading(get_string('pluginname', 'report_feedbackdashboard'));
-}
-
 echo $OUTPUT->header();
-
-if (!isloggedin() || $USER->id == 1) {
-  echo get_string('loggedout', 'report_feedbackdashboard');
-  echo $OUTPUT->footer();
-  die();
-}
-
-echo get_string('instructions', 'report_feedbackdashboard');
-echo '<br>';
+echo get_string('instructions', 'report_feedbackdashboard'). '<br>';
 echo get_string('disclaimer', 'report_feedbackdashboard');
 echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
-$user = $USER->id;
-$courses = enrol_get_all_users_courses($user, 1, 'enddate', 'enddate DESC');
+$courses = enrol_get_all_users_courses($USER->id, 1, 'enddate', 'enddate DESC');
 
-foreach ($courses as $course) {
-  $context = context_course::instance($course->id);
-  if(has_capability('mod/assign:submit', $context)){
-    $course_category_ids[] = $course->category;
-  }
+if(isset($courses)){
+	$assignments = get_assignments($courses);
+	$assignmentids = null;
+	foreach ($assignments as $assignment) {
+		if(isset($assignment->id)){
+			$assignmentids .= $assignment->id . ',';
+		}
+	}
+	$assignmentids = rtrim($assignmentids, ",");
+	
+	$turnitinfeedback = null; //get_turnitin_feedback($assignmentids);
+	$feedbackcomments = get_feedback_comments($assignmentids);
+	$feedbackfiles = get_feedback_files($assignmentids);
+	$submission = get_submission_status($assignmentids);
+
+	foreach ($courses as $course) { //for each the user's units
+		echo html_writer::start_tag('div', ['class'=>'feedbackdashboard_unit']);
+		echo html_writer::tag('h3', $course->fullname);
+		echo html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+
+		$table = create_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
+		
+		echo html_writer::table($table); //show the table
+		echo html_writer::end_tag('div', ['class'=>'feedbackdashboard_unit']);
+	}
 }
-
-$course_category_names = get_course_category_names($course_category_ids);
-
-$assignments = get_unit_assignments($courses, $user);
-
-foreach ($assignments as $assignment) {
-  $assignment_ids[] = $assignment->id;
-}
-
-$turnitin_feedback = get_turnitin_feedback($assignment_ids, $user);
-$feedback_comments = get_feedback_comments($assignment_ids, $user);
-$feedback_files = get_feedback_files($assignment_ids, $user);
-$submission = get_submission_status($assignment_ids, $user);
-
-foreach ($courses as $course) { //for each the user's units
-  if (strpos(strtolower($course_category_names[$course->category]->name), 'module pages') !== false) { //check if the course is a unit page
-
-    $assignment_count = 0; //keep track of the number of assignments;
-    $grading_info = [];
-    foreach ($assignments as $assignment) { //go through every assignment in the unit
-      if ($assignment->course == $course->id && $assignment->hidden == "0" && $assignment->idnumber != null && $assignment->deletioninprogress == 0) { /*if the assignment
-        belongs to the unit, is not hidden, has an idnumber and is not being deleted*/
-
-          $grading_info[] = grade_get_grades($assignment->course, 'mod', 'assign', $assignment->iteminstance, $USER->id); //get the grade information for the user
-          $assignment_count++; //add one to the assignment count
-
-      }
-
-    }
-
-    echo html_writer::start_tag('div', ['class'=>'feedbackdashboard_unit']);
-    echo html_writer::tag('h3', $course->fullname);
-	  echo html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
-
-    if ($assignment_count != 0) { //if the unit has assignments...
-        $table = create_table($assignments, $grading_info, $turnitin_feedback, $feedback_comments, $feedback_files, $submission); //generate a table containing the assignment information and grades
-        echo html_writer::table($table); //show the table
-    } else {
-      echo html_writer::tag('p', get_string('noassignments', 'report_feedbackdashboard'));
-    }
-      echo html_writer::end_tag('div', ['class'=>'feedbackdashboard_unit']);
-  }
-}
-
 echo $OUTPUT->footer();
