@@ -47,35 +47,36 @@ $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create
 $event->trigger();
 
 echo $OUTPUT->header();
-echo get_string('instructions', 'report_feedbackdashboard'). '<br>';
-echo get_string('disclaimer', 'report_feedbackdashboard');
-echo "<button id= 'print_btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
-$courses = enrol_get_all_users_courses($USER->id, 1, 'enddate', 'enddate DESC');
+echo "<button id='print-btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
+
+$courses = enrol_get_my_courses('enddate', 'enddate DESC');
+$validcourses = null;
 
 if(isset($courses)){
-	$assignments = get_assignments($courses);
-	$assignmentids = null;
-	foreach ($assignments as $assignment) {
-		if(isset($assignment->id)){
-			$assignmentids .= $assignment->id . ',';
-		}
-	}
-	$assignmentids = rtrim($assignmentids, ",");
+	$studentcourses = array();	
+	$tutorcourses = array();
 	
-	$turnitinfeedback = null; //get_turnitin_feedback($assignmentids);
-	$feedbackcomments = get_feedback_comments($assignmentids);
-	$feedbackfiles = get_feedback_files($assignmentids);
-	$submission = get_submission_status($assignmentids);
-
-	foreach ($courses as $course) { //for each the user's units
-		echo html_writer::start_tag('div', ['class'=>'feedbackdashboard_unit']);
-		echo html_writer::tag('h3', $course->fullname);
-		echo html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
-
-		$table = create_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
+	foreach ($courses as $course) {
+		$category = core_course_category::get($course->category, IGNORE_MISSING);		
+		$context = context_course::instance($course->id);
 		
-		echo html_writer::table($table); //show the table
-		echo html_writer::end_tag('div', ['class'=>'feedbackdashboard_unit']);
+		if(has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false){
+			$studentcourses[$course->id] = $course;
+			$validcourses = 1;
+		}
+
+		if(has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false){
+			$tutorcourses[$course->id] = $course;
+			$validcourses = 1;
+		}		
 	}
+
+	echo get_student_dashboard($studentcourses, $tutorcourses);	
+	echo get_tutor_dashboard($tutorcourses, $studentcourses);
+}	
+
+if($validcourses == null){
+	echo get_string('nodashboard', 'report_feedbackdashboard');
 }
+
 echo $OUTPUT->footer();

@@ -3,7 +3,7 @@
     display: block;
   }
   #page-report-feedbackdashboard-index .page-header-headings h1 {
-    font-size: 30px;
+    /*font-size: 30px;*/
   }
 }
 
@@ -11,31 +11,43 @@ table#feedbackdashboard {
     width: 100%;
 }
 
-/* #feedbackdashboard table, p{ */
-  /* font-size: 15px */
-/* } */
+#feedbackdashboard .grading-action{
+  background-color: #f7dddc;
+}
+
+#feedbackdashboard .grading-complete{
+  background-color: #def1de;
+}
+
+#feedbackdashboard .grading-warning{
+  background-color: #fff3cd;
+}
 
 #feedbackdashboard th{
   text-align: left;
 }
 
 #feedbackdashboard th, td{
-  padding: 5px;
+  padding: 5px !important;
 }
 
 #feedbackdashboard td{
   border-bottom: 1px solid #eee;
 }
 
-.feedbackdashboard_unit {
+.feedbackdashboard-instructions{
+	margin-top: 30px;
+}
+
+.feedbackdashboard-course {
   margin-bottom: 50px;
 }
 
-.feedbackdashboard_unit .cell {
+.feedbackdashboard-course .cell {
   width: 16.666%;
 }
 
-#page-report-feedbackdashboard-index #print_btn {
+#page-report-feedbackdashboard-index #print-btn {
   float: right;
 }
 
@@ -46,7 +58,7 @@ table#feedbackdashboard {
   #page-report-feedbackdashboard-index #region-main {
     padding-top: 0 !important;
   }
-  #page-report-feedbackdashboard-index #print_btn {
+  #page-report-feedbackdashboard-index #print-btn {
     display: none;
   }
   #page-report-feedbackdashboard-index #page-footer {
