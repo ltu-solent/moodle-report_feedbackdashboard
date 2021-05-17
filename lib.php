@@ -330,24 +330,30 @@ function create_tutor_table($course, $assignments) {
 				if($assignment->gradingurgent == 1 && $assignment->students != 0){
 					$message = get_string('gradingrelease', 'report_feedbackdashboard');
 					$row->attributes['class'] = 'grading-action';
-				}elseif($assignment->duedate < $assignment->timenow && $assignment->gradingduedate > $assignment->timenow && $assignment->students != 0){
+				}
+                
+                if($assignment->duedate < $assignment->timenow && $assignment->gradingduedate > $assignment->timenow && $assignment->students != 0){
 					//Work out number of days due				
 					$datediff = $assignment->timenow - $assignment->gradingduedate;
 					$days = ltrim(round($datediff / (60 * 60 * 24)), "-");
 
 					$message = get_string('gradingduein', 'report_feedbackdashboard', ['days'=>$days]);
-					$row->attributes['class'] = 'grading-warning';
-				}elseif ($assignment->locked != 0 && $assignment->visible == 0 && $assignment->students != 0){
+                    $row->attributes['class'] = 'grading-warning';
+				}
+                
+                if ($assignment->locked != 0 && $assignment->visible == 0 && $assignment->students != 0){
 					$message = get_string('gradingreleasedhidden', 'report_feedbackdashboard');
 					$row->attributes['class'] = 'grading-action';
-				}elseif ($assignment->locked != 0 && $assignment->blindmarking == 1 && $assignment->revealidentities == 0 && $assignment->students != 0){
+				}
+                
+                if ($assignment->locked != 0 && $assignment->blindmarking == 1 && $assignment->revealidentities == 0 && $assignment->students != 0){
 					$message = get_string('gradingreleasedidentities', 'report_feedbackdashboard');
 					$row->attributes['class'] = 'grading-action';
-				}elseif($assignment->gradesvisible == 1 && $assignment->students != 0){
+				}
+                
+                if($assignment->gradesvisible == 1 && $assignment->students != 0){
 					$message = get_string('gradingreleased', 'report_feedbackdashboard');
 					$row->attributes['class'] = 'grading-complete';
-				}else{
-					$message = "";
 				}
 				
 				if($assignment->gradinglate == 1 && $assignment->students != 0){
@@ -362,7 +368,7 @@ function create_tutor_table($course, $assignments) {
 					
 					$cell6 = new html_table_cell($message . get_string('dayslate', 'report_feedbackdashboard', ['dayslate'=>$days]));
 				}else{
-					$cell6 = new html_table_cell($message);
+					$cell6 = new html_table_cell();
 				}
 		
 				$row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
