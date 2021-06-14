@@ -327,6 +327,7 @@ function create_tutor_table($course, $assignments) {
 				}
 				$cell5 = new html_table_cell(get_string('students', 'report_feedbackdashboard') . $assignment->students . $submissions);
 				
+                $message = '';
 				if($assignment->gradingurgent == 1 && $assignment->students != 0){
 					$message = get_string('gradingrelease', 'report_feedbackdashboard');
 					$row->attributes['class'] = 'grading-action';
@@ -368,7 +369,7 @@ function create_tutor_table($course, $assignments) {
 					
 					$cell6 = new html_table_cell($message . get_string('dayslate', 'report_feedbackdashboard', ['dayslate'=>$days]));
 				}else{
-					$cell6 = new html_table_cell();
+					$cell6 = new html_table_cell($message);
 				}
 		
 				$row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
