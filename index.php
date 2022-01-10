@@ -71,8 +71,8 @@ if(isset($courses)){
 		}		
 	}
 
-	echo get_student_dashboard($studentcourses, $tutorcourses);	
-	echo get_tutor_dashboard($tutorcourses, $studentcourses);
+	echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);	
+	echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);
 }	
 
 if($validcourses == null){

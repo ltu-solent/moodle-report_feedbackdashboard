@@ -1,6 +1,6 @@
 <?php
 
-function get_assignments($courseids){
+function report_feedbackdashboard_get_assignments($courseids){
 	global $DB;	
 	
 	list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_QM, '', 1);			
@@ -29,7 +29,7 @@ function get_assignments($courseids){
 	return $assignments;
 }
 
-function get_turnitin_feedback($assignmentids) {	
+function report_feedbackdashboard_get_turnitin_feedback($assignmentids) {	
 	global $DB, $USER;
 	
 	list($insql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);			
@@ -50,7 +50,7 @@ function get_turnitin_feedback($assignmentids) {
     return $turnitinfeedback;
 }
 
-function get_feedback_comments($assignmentids) {
+function report_feedbackdashboard_get_feedback_comments($assignmentids) {
 	global $DB, $USER;
 
 	list($insql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);	
@@ -68,7 +68,7 @@ function get_feedback_comments($assignmentids) {
     return $comments;
 }
 
-function get_feedback_files($assignmentids) {
+function report_feedbackdashboard_get_feedback_files($assignmentids) {
 	global $DB, $USER;
 			
 	list($insql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);	
@@ -85,7 +85,7 @@ function get_feedback_files($assignmentids) {
 	return $files;
 }
 
-function get_submission_status($assignmentids) {
+function report_feedbackdashboard_get_submission_status($assignmentids) {
 	global $DB, $USER;
 
 	list($insql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);	
@@ -101,7 +101,7 @@ function get_submission_status($assignmentids) {
 	return $submission;
 }
 
-function get_tutor_data($assignmentids){	
+function report_feedbackdashboard_get_tutor_data($assignmentids){	
 	global $DB;		
 
 	list($inorequalsql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);			
@@ -168,7 +168,7 @@ function get_tutor_data($assignmentids){
 	return $data;
 }
 
-function create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission) {
+function report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission) {
 	global $CFG, $USER;
 	
 	$txt = get_strings(array('assignmentname', 'duedate', 'datesubmitted', 'gradeddate', 'feedback', 'grade'), 'report_feedbackdashboard');
@@ -267,7 +267,7 @@ function create_student_table($course, $assignments, $turnitinfeedback, $feedbac
     return $table;
 }
 
-function create_tutor_table($course, $assignments) {
+function report_feedbackdashboard_create_tutor_table($course, $assignments) {
 	global $CFG, $USER;
 	require_once($CFG->dirroot.'/mod/assign/locallib.php');	
 	
@@ -388,7 +388,7 @@ function create_tutor_table($course, $assignments) {
     return $table;
 }
 
-function get_student_dashboard($courses, $tutorcourses){
+function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses){
 	$html = null;
 	if(count($tutorcourses) > 0){			
 		$html .= html_writer::tag('h1', get_string('studentdashboard', 'report_feedbackdashboard'));			
@@ -399,21 +399,21 @@ function get_student_dashboard($courses, $tutorcourses){
 	$html .= html_writer::end_tag('div');
 	
 	if(!empty($courses)){
-		$assignments = get_assignments(array_keys($courses));
+		$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
 		$assignmentids = array_keys($assignments);
 		
 		if(count($assignments) > 0){		
-			$turnitinfeedback = get_turnitin_feedback($assignmentids);
-			$feedbackcomments = get_feedback_comments($assignmentids);
-			$feedbackfiles = get_feedback_files($assignmentids);
-			$submission = get_submission_status($assignmentids);	
+			$turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
+			$feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
+			$feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
+			$submission = report_feedbackdashboard_get_submission_status($assignmentids);	
 
 			foreach ($courses as $course) { //for each the user's units
 				$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
 				$html .= html_writer::tag('h3', $course->fullname);
 				$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
 
-				$table = create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
+				$table = report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
 				
 				$html .= html_writer::table($table); //show the table
 				$html .= html_writer::end_tag('div');
@@ -426,7 +426,7 @@ function get_student_dashboard($courses, $tutorcourses){
 	}
 }
 
-function get_tutor_dashboard($courses, $studentcourses){	
+function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses){	
 	global $CFG;
 	require_once($CFG->dirroot.'/mod/assign/externallib.php');	
 
@@ -440,17 +440,17 @@ function get_tutor_dashboard($courses, $studentcourses){
 		$html .= get_string('instructionstutor', 'report_feedbackdashboard');
 		$html .= html_writer::end_tag('div');
 		
-		$assignments = get_assignments(array_keys($courses));
+		$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
 
 		if(count($assignments) > 0){		
-			$data = get_tutor_data(array_keys($assignments));		
+			$data = report_feedbackdashboard_get_tutor_data(array_keys($assignments));		
 
 			foreach ($courses as $course) { //for each the user's units
 				$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
 				$html .= html_writer::tag('h3', $course->fullname);
 				$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
 
-				$table = create_tutor_table($course, $data); //generate a table containing the assignment information and grades
+				$table = report_feedbackdashboard_create_tutor_table($course, $data); //generate a table containing the assignment information and grades
 				$html .= html_writer::table($table); //show the table
 				$html .= html_writer::end_tag('div');
 			}
