@@ -25,7 +25,7 @@
 global $PAGE, $USER, $COURSE;
 
 require('../../config.php');
-require('lib.php');
+require_once('lib.php');
 require_once($CFG->dirroot.'/mod/assign/locallib.php');
 
 require_login(true);
