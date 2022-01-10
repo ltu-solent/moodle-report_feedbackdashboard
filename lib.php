@@ -108,8 +108,8 @@ function get_tutor_data($assignmentids){
 	$params = [] + $inparams;
 
 	$sql = "SELECT a.id, cm.id cm, a.name, a.duedate, c.id course, c.shortname,
-			(SELECT COUNT(ra.userid) FROM mdl_role_assignments AS ra
-			JOIN mdl_context AS ctx ON ra.contextid = ctx.id
+			(SELECT COUNT(ra.userid) FROM {role_assignments} AS ra
+			JOIN {context} AS ctx ON ra.contextid = ctx.id
 			WHERE ra.roleid = 5 AND ctx.instanceid = c.id
 			) as students,
 			(SELECT count(*)
