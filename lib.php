@@ -1,5 +1,36 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Report Feedback Dashboard Lib file.
+ *
+ * @package   report_feedbackdashboard
+ * @author    Mark Sharp <mark.sharp@solent.ac.uk>
+ * @copyright 2022 Solent University {@link https://solent.ac.uk}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Get assignments for given courseids
+ *
+ * @param array $courseids IDs of courses
+ * @return array Array of Assignment data
+ */
 function report_feedbackdashboard_get_assignments($courseids) {
     global $DB;
 
@@ -30,6 +61,12 @@ function report_feedbackdashboard_get_assignments($courseids) {
     return $assignments;
 }
 
+/**
+ * Get Turnitin Feedback for current user
+ *
+ * @param array $assignmentids Array of assignment IDs for the user
+ * @return array Array of Feedback data for given assignments
+ */
 function report_feedbackdashboard_get_turnitin_feedback($assignmentids) {
     global $DB, $USER;
 
@@ -51,6 +88,12 @@ function report_feedbackdashboard_get_turnitin_feedback($assignmentids) {
     return $turnitinfeedback;
 }
 
+/**
+ * Get feedback from the Comments feedback subplugin for given assignmentids
+ *
+ * @param array $assignmentids Array of Assignment IDs
+ * @return array Array of comment text for assignments
+ */
 function report_feedbackdashboard_get_feedback_comments($assignmentids) {
     global $DB, $USER;
 
@@ -66,6 +109,12 @@ function report_feedbackdashboard_get_feedback_comments($assignmentids) {
     return $comments;
 }
 
+/**
+ * Get feedback file count from Feedback Files subplugin for given assignment IDs
+ *
+ * @param array $assignmentids Assignment IDs
+ * @return array Count of number of feedback files for each assignment
+ */
 function report_feedbackdashboard_get_feedback_files($assignmentids) {
     global $DB, $USER;
 
@@ -82,6 +131,12 @@ function report_feedbackdashboard_get_feedback_files($assignmentids) {
     return $files;
 }
 
+/**
+ * Get submission status for given AssignmentIDs for current user
+ *
+ * @param array $assignmentids Array of AssignmentIDs
+ * @return array Array of submission data
+ */
 function report_feedbackdashboard_get_submission_status($assignmentids) {
     global $DB, $USER;
 
@@ -97,6 +152,12 @@ function report_feedbackdashboard_get_submission_status($assignmentids) {
     return $submission;
 }
 
+/**
+ * Get assignment data for Tutor's feedback report for each Assignment
+ *
+ * @param array $assignmentids Array of assignment IDs
+ * @return array Assignment, Submission and Feedback data for given assignments
+ */
 function report_feedbackdashboard_get_tutor_data($assignmentids) {
     global $DB;
 
@@ -163,6 +224,17 @@ function report_feedbackdashboard_get_tutor_data($assignmentids) {
     return $data;
 }
 
+/**
+ * Create Student Feedback Table
+ *
+ * @param object $course Course object
+ * @param array $assignments List of assignment objects for course
+ * @param array $turnitinfeedback List of Turnitin feedback objects for course
+ * @param array $feedbackcomments List of Comment feedback objects for course
+ * @param array $feedbackfiles List of File feedback objects for course
+ * @param array $submission List of Submission data for course
+ * @return html_table HTML output of Course Feedback table
+ */
 function report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments,
     $feedbackfiles, $submission) {
     global $CFG, $USER;
@@ -281,6 +353,13 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
     return $table;
 }
 
+/**
+ * Create Tutor feedback dashboard table
+ *
+ * @param objects $course Course object
+ * @param array $assignments Array of Assignment objects
+ * @return html_table HTML Table of assignment data for given course.
+ */
 function report_feedbackdashboard_create_tutor_table($course, $assignments) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
@@ -310,119 +389,128 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
         $txt->gradingstatus
     ];
 
-    if ($assigncount > 0) {
-        $gradinginfo = null;
-
-        foreach ($assignments as $assignment) {
-            if ($assignment->course == $course->id) {
-                $context = context_module::instance($assignment->cm);
-                $cm = get_coursemodule_from_instance('assign', $assignment->cm, 0);
-                $assignclass = new assign($context, $cm, $course);
-                $cmid = $assignment->cm;
-                $row = new html_table_row();
-
-                if ($assignment->visible == 0 ) {
-                    $cell1 = new html_table_cell(
-                        html_writer::link(
-                            new moodle_url('/mod/assign/view.php', ['id' => $cmid]), $assignment->name . $txt->hidden
-                        )
-                    );
-                } else {
-                    $cell1 = new html_table_cell(
-                        html_writer::link(
-                            new moodle_url('/mod/assign/view.php', ['id' => $cmid]), $assignment->name
-                        )
-                    );
-                }
-
-                $cell2 = new html_table_cell(date('d-m-Y, g:i A', ($assignment->duedate)));
-                $cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignment->gradingduedate)));
-
-                $typeno = 0;
-                $types = [];
-                foreach ($assignclass->get_submission_plugins() as $plugin) {
-                    if ($plugin->is_enabled() && $plugin->is_visible()) {
-                        if ($plugin->get_type() != 'comments') {
-                            $typeno++;
-                            $types[] = get_string($plugin->get_type(), 'assignsubmission_' . $plugin->get_type());
-                        }
-                    }
-                }
-                $cell4 = new html_table_cell(html_writer::alist($types));
-
-                $submissions = '';
-                if ($typeno > 0 && $assignment->students != 0) {
-                    $submissions = $txt->celldrafts . $assignment->drafts . $txt->cellsubmissions . $assignment->submissions;
-                }
-                $cell5 = new html_table_cell($txt->students . $assignment->students . $submissions);
-
-                $message = '';
-                if ($assignment->gradingurgent == 1 && $assignment->students != 0) {
-                    $message = $txt->gradingrelease;
-                    $row->attributes['class'] = 'grading-action';
-                }
-
-                if ($assignment->duedate < $assignment->timenow &&
-                    $assignment->gradingduedate > $assignment->timenow &&
-                    $assignment->students != 0) {
-                    // Work out number of days due.
-                    $datediff = $assignment->timenow - $assignment->gradingduedate;
-                    $days = ltrim(round($datediff / (60 * 60 * 24)), "-");
-
-                    $message = get_string('gradingduein', 'report_feedbackdashboard', ['days' => $days]);
-                    $row->attributes['class'] = 'grading-warning';
-                }
-
-                if ($assignment->locked != 0 && $assignment->visible == 0 && $assignment->students != 0) {
-                    $message = $txt->gradingreleasedhidden;
-                    $row->attributes['class'] = 'grading-action';
-                }
-
-                if ($assignment->locked != 0 &&
-                    $assignment->blindmarking == 1 &&
-                    $assignment->revealidentities == 0 &&
-                    $assignment->students != 0) {
-                    $message = $txt->gradingreleasedidentities;
-                    $row->attributes['class'] = 'grading-action';
-                }
-
-                if ($assignment->gradesvisible == 1 && $assignment->students != 0) {
-                    $message = $txt->gradingreleased;
-                    $row->attributes['class'] = 'grading-complete';
-                }
-
-                if ($assignment->gradinglate == 1 && $assignment->students != 0) {
-                    // Work out number of days late.
-                    if ($assignment->locked == 0) {
-                        $datediff = $assignment->gradingduedate - $assignment->timenow;
-                    } else {
-                        $datediff = $assignment->gradingduedate - $assignment->locked;
-                    }
-
-                    $days = ltrim(round($datediff / (60 * 60 * 24)), "-");
-
-                    $cell6 = new html_table_cell(
-                        $message . get_string('dayslate', 'report_feedbackdashboard', ['dayslate' => $days])
-                    );
-                } else {
-                    $cell6 = new html_table_cell($message);
-                }
-
-                $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
-                $table->data[] = $row;
-            }
-        }
-    } else {
+    if ($assigncount == 0) {
         $fillercell = new html_table_cell();
         $fillercell->text = html_writer::tag('p', $txt->noassignments);
         $fillercell->colspan = 6;
         $row = new html_table_row(array($fillercell));
+        $table->data[] = $row;
+        return $table;
+    }
+
+    $gradinginfo = null;
+
+    foreach ($assignments as $assignment) {
+        if ($assignment->course != $course->id) {
+            continue;
+        }
+        $context = context_module::instance($assignment->cm);
+        $cm = get_coursemodule_from_instance('assign', $assignment->cm, 0);
+        $assignclass = new assign($context, $cm, $course);
+        $cmid = $assignment->cm;
+        $row = new html_table_row();
+
+        if ($assignment->visible == 0 ) {
+            $cell1 = new html_table_cell(
+                html_writer::link(
+                    new moodle_url('/mod/assign/view.php', ['id' => $cmid]), $assignment->name . $txt->hidden
+                )
+            );
+        } else {
+            $cell1 = new html_table_cell(
+                html_writer::link(
+                    new moodle_url('/mod/assign/view.php', ['id' => $cmid]), $assignment->name
+                )
+            );
+        }
+
+        $cell2 = new html_table_cell(date('d-m-Y, g:i A', ($assignment->duedate)));
+        $cell3 = new html_table_cell(date('d-m-Y, g:i A', ($assignment->gradingduedate)));
+
+        $typeno = 0;
+        $types = [];
+        foreach ($assignclass->get_submission_plugins() as $plugin) {
+            if ($plugin->is_enabled() && $plugin->is_visible()) {
+                if ($plugin->get_type() != 'comments') {
+                    $typeno++;
+                    $types[] = get_string($plugin->get_type(), 'assignsubmission_' . $plugin->get_type());
+                }
+            }
+        }
+        $cell4 = new html_table_cell(html_writer::alist($types));
+
+        $submissions = '';
+        if ($typeno > 0 && $assignment->students != 0) {
+            $submissions = $txt->celldrafts . $assignment->drafts . $txt->cellsubmissions . $assignment->submissions;
+        }
+        $cell5 = new html_table_cell($txt->students . $assignment->students . $submissions);
+
+        $message = '';
+        if ($assignment->gradingurgent == 1 && $assignment->students != 0) {
+            $message = $txt->gradingrelease;
+            $row->attributes['class'] = 'grading-action';
+        }
+
+        if ($assignment->duedate < $assignment->timenow &&
+            $assignment->gradingduedate > $assignment->timenow &&
+            $assignment->students != 0) {
+            // Work out number of days due.
+            $datediff = $assignment->timenow - $assignment->gradingduedate;
+            $days = ltrim(round($datediff / (60 * 60 * 24)), "-");
+
+            $message = get_string('gradingduein', 'report_feedbackdashboard', ['days' => $days]);
+            $row->attributes['class'] = 'grading-warning';
+        }
+
+        if ($assignment->locked != 0 && $assignment->visible == 0 && $assignment->students != 0) {
+            $message = $txt->gradingreleasedhidden;
+            $row->attributes['class'] = 'grading-action';
+        }
+
+        if ($assignment->locked != 0 &&
+            $assignment->blindmarking == 1 &&
+            $assignment->revealidentities == 0 &&
+            $assignment->students != 0) {
+            $message = $txt->gradingreleasedidentities;
+            $row->attributes['class'] = 'grading-action';
+        }
+
+        if ($assignment->gradesvisible == 1 && $assignment->students != 0) {
+            $message = $txt->gradingreleased;
+            $row->attributes['class'] = 'grading-complete';
+        }
+
+        if ($assignment->gradinglate == 1 && $assignment->students != 0) {
+            // Work out number of days late.
+            if ($assignment->locked == 0) {
+                $datediff = $assignment->gradingduedate - $assignment->timenow;
+            } else {
+                $datediff = $assignment->gradingduedate - $assignment->locked;
+            }
+
+            $days = ltrim(round($datediff / (60 * 60 * 24)), "-");
+
+            $cell6 = new html_table_cell(
+                $message . get_string('dayslate', 'report_feedbackdashboard', ['dayslate' => $days])
+            );
+        } else {
+            $cell6 = new html_table_cell($message);
+        }
+
+        $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
         $table->data[] = $row;
     }
 
     return $table;
 }
 
+/**
+ * Returns the Student Feedback dashboard HTML
+ *
+ * @param array $courses List of course objects the user is enrolled on
+ * @param array $tutorcourses List of Tutor courses the user is enrolled on.
+ * @return string HTML of the Student Dashboard page
+ */
 function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses) {
     $html = null;
     if (count($tutorcourses) > 0) {
@@ -438,34 +526,44 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
     }
 
     $assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
+
+    if (count($assignments) == 0) {
+        return '';
+    }
+
     $assignmentids = array_keys($assignments);
 
-    if (count($assignments) > 0) {
-        $turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
-        $feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
-        $feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
-        $submission = report_feedbackdashboard_get_submission_status($assignmentids);
+    $turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
+    $feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
+    $feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
+    $submission = report_feedbackdashboard_get_submission_status($assignmentids);
 
-        foreach ($courses as $course) {
-            $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
-            $html .= html_writer::tag('h3', $course->fullname);
-            $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+    foreach ($courses as $course) {
+        $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
+        $html .= html_writer::tag('h3', $course->fullname);
+        $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
 
-            $table = report_feedbackdashboard_create_student_table(
-                $course,
-                $assignments,
-                $turnitinfeedback,
-                $feedbackcomments,
-                $feedbackfiles,
-                $submission
-            );
-            $html .= html_writer::table($table);
-            $html .= html_writer::end_tag('div');
-        }
-        return $html;
+        $table = report_feedbackdashboard_create_student_table(
+            $course,
+            $assignments,
+            $turnitinfeedback,
+            $feedbackcomments,
+            $feedbackfiles,
+            $submission
+        );
+        $html .= html_writer::table($table);
+        $html .= html_writer::end_tag('div');
     }
+    return $html;
 }
 
+/**
+ * Returns the Tutor Feedback dashboard HTML
+ *
+ * @param array $courses List of course objects the user is enrolled on as a tutor
+ * @param array $studentcourses List of course objects the user is enrolled on as a student
+ * @return string HTML output of the Tutor dashboard
+ */
 function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses) {
     global $CFG;
     require_once($CFG->dirroot.'/mod/assign/externallib.php');
@@ -484,19 +582,19 @@ function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses)
 
     $assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
 
-    if (count($assignments) > 0) {
-        $data = report_feedbackdashboard_get_tutor_data(array_keys($assignments));
+    if (count($assignments) == 0) {
+        return '';
+    }
 
-        foreach ($courses as $course) {
-            $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
-            $html .= html_writer::tag('h3', $course->fullname);
-            $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+    $data = report_feedbackdashboard_get_tutor_data(array_keys($assignments));
 
-            $table = report_feedbackdashboard_create_tutor_table($course, $data);
-            $html .= html_writer::table($table);
-            $html .= html_writer::end_tag('div');
-        }
+    foreach ($courses as $course) {
+        $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
+        $html .= html_writer::tag('h3', $course->fullname);
+        $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
 
-        return $html;
+        $table = report_feedbackdashboard_create_tutor_table($course, $data);
+        $html .= html_writer::table($table);
+        $html .= html_writer::end_tag('div');
     }
 }
