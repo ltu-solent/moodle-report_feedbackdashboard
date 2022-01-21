@@ -597,4 +597,5 @@ function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses)
         $html .= html_writer::table($table);
         $html .= html_writer::end_tag('div');
     }
+    return $html;
 }
