@@ -17,8 +17,7 @@
 /**
  * Strings
  *
- * @package    report
- * @subpackage feedbackdashboard
+ * @package    report_feedbackdashboard
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
