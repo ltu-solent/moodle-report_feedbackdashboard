@@ -23,9 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021050501;       // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;       // Requires this Moodle version
-$plugin->component = 'report_feedbackdashboard'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2021050501;
+$plugin->requires  = 2016112900;
+$plugin->component = 'report_feedbackdashboard';
 $plugin->release = '3.9.1';
