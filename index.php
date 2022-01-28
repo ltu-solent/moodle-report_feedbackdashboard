@@ -22,7 +22,7 @@
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-global $PAGE, $USER, $COURSE;
+
 
 require('../../config.php');
 require_once('lib.php');
@@ -37,13 +37,13 @@ $PAGE->set_title(get_string('pluginname', 'report_feedbackdashboard'));
 $PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
 
 // Trigger an grade report viewed event.
-$event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create(array(
-            'context' => context_user::instance($USER->id),
-            'relateduserid' => $USER->id,
-            'other' => array(
-                  'userid' => $USER->id
-              )
-          ));
+$event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create([
+    'context' => context_user::instance($USER->id),
+    'relateduserid' => $USER->id,
+    'other' => [
+        'userid' => $USER->id
+    ]
+]);
 $event->trigger();
 
 echo $OUTPUT->header();
@@ -52,31 +52,31 @@ echo "<button id='print-btn' onClick='window.print()'>" . get_string('print', 'r
 $courses = enrol_get_my_courses('enddate', 'enddate DESC');
 $validcourses = null;
 
-if(isset($courses)){
-	$studentcourses = array();	
-	$tutorcourses = array();
-	
-	foreach ($courses as $course) {
-		$category = core_course_category::get($course->category, IGNORE_MISSING);		
-		$context = context_course::instance($course->id);
-		
-		if(has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false){
-			$studentcourses[$course->id] = $course;
-			$validcourses = 1;
-		}
+if (isset($courses)) {
+    $studentcourses = array();
+    $tutorcourses = array();
 
-		if(has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false){
-			$tutorcourses[$course->id] = $course;
-			$validcourses = 1;
-		}		
-	}
+    foreach ($courses as $course) {
+        $category = core_course_category::get($course->category, IGNORE_MISSING);
+        $context = context_course::instance($course->id);
 
-	echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);	
-	echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);
-}	
+        if (has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false) {
+            $studentcourses[$course->id] = $course;
+            $validcourses = 1;
+        }
 
-if($validcourses == null){
-	echo get_string('nodashboard', 'report_feedbackdashboard');
+        if (has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false) {
+            $tutorcourses[$course->id] = $course;
+            $validcourses = 1;
+        }
+    }
+
+    echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);
+    echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);
+}
+
+if ($validcourses == null) {
+    echo get_string('nodashboard', 'report_feedbackdashboard');
 }
 
 echo $OUTPUT->footer();
