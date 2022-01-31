@@ -46,7 +46,8 @@ $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create
 $event->trigger();
 
 echo $OUTPUT->header();
-echo "<button id='print-btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
+echo '<button id="print-btn" onClick="window.print()" class="btn btn-secondary float-right">' . 
+    html_writer::tag('i', '', ['class' => 'fa fa-print']) . ' ' . get_string('print', 'report_feedbackdashboard') . '</button>';
 
 $courses = enrol_get_my_courses('enddate', 'enddate DESC');
 $validcourses = null;
