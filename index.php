@@ -50,10 +50,8 @@ $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create
 $event->trigger();
 
 echo $OUTPUT->header();
-echo "<button id='print-btn' onClick='window.print()'>" . get_string('print', 'report_feedbackdashboard') . "</button><br>";
 
 $courses = enrol_get_my_courses('enddate', 'enddate DESC');
-$validcourses = null;
 
 if (count($courses) == 0) {
     echo get_string('nodashboard', 'report_feedbackdashboard');
@@ -61,31 +59,33 @@ if (count($courses) == 0) {
     exit();
 }
 
-if (isset($courses)) {
-    $studentcourses = array();
-    $tutorcourses = array();
-    
-    foreach ($courses as $course) {
-        $category = core_course_category::get($course->category, IGNORE_MISSING);
-        $context = context_course::instance($course->id);
-        
-        if(has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false){
-            $studentcourses[$course->id] = $course;
-            $validcourses = 1;
-        }
+$studentcourses = array();
+$tutorcourses = array();
+$validcourses = false;
 
-        if(has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false){
-            $tutorcourses[$course->id] = $course;
-            $validcourses = 1;
-        }		
+foreach ($courses as $course) {
+    $category = core_course_category::get($course->category, IGNORE_MISSING);
+    $context = context_course::instance($course->id);
+    
+    // Shows all modules to students.
+    if (has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false) {
+        $studentcourses[$course->id] = $course;
+        $validcourses = true;
     }
 
+    // Shows only current modules to tutors.
+    if (has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false) {
+        $tutorcourses[$course->id] = $course;
+        $validcourses = true;
+    }		
+}
+
+if (!$validcourses) {
+    echo get_string('nodashboard', 'report_feedbackdashboard');
+} else {
+    echo '<button id="print-btn" class="btn btn-primary" onClick="window.print()">' . get_string('print', 'report_feedbackdashboard') . '</button><br>';
     echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);
     echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);
-}	
-
-if($validcourses == null){
-    echo get_string('nodashboard', 'report_feedbackdashboard');
 }
 
 echo $OUTPUT->footer();
