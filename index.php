@@ -22,11 +22,10 @@
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-global $PAGE, $USER, $COURSE;
 
-require('../../config.php');
-require_once('lib.php');
-require_once($CFG->dirroot.'/mod/assign/locallib.php');
+
+require_once('../../config.php');
+require_once($CFG->dirroot .'/report/feedbackdashboard/lib.php');
 
 if (isguestuser()) {
     throw new moodle_exception('viewfeedbackerror', 'report_feedbackdashboard');
