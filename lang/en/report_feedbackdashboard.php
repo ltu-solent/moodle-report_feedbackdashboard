@@ -72,3 +72,5 @@ $string['students'] = 'Students: ';
 $string['submissions'] = 'Submissions';
 $string['submissiontypes'] = 'Submission types';
 $string['tutordashboard'] = 'Tutor dashboard';
+
+$string['viewfeedbackerror'] = 'Sorry, you do not have permissions to view feedback.';

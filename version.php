@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2021050501;       // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2021050502;       // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2016112900;       // Requires this Moodle version
 $plugin->component = 'report_feedbackdashboard'; // Full name of the plugin (used for diagnostics)
 $plugin->release = '3.9.1';

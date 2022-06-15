@@ -28,13 +28,16 @@ require('../../config.php');
 require_once('lib.php');
 require_once($CFG->dirroot.'/mod/assign/locallib.php');
 
-require_login(true);
+if (isguestuser()) {
+	throw new moodle_exception('viewfeedbackerror', 'report_feedbackdashboard');
+}
 
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context(context_user::instance($USER->id));
 $PAGE->set_url('/report/feedbackdashboard/index.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('pluginname', 'report_feedbackdashboard'));
-$PAGE->set_heading($USER->firstname . ' ' . $USER->lastname . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
+
+$PAGE->set_heading(fullname($USER) . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
 
 // Trigger an grade report viewed event.
 $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create(array(
