@@ -23,7 +23,6 @@
  */
 namespace report_feedbackdashboard\event;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The report_feedbackdashboard feedbackdashboard report viewed event class.
@@ -69,7 +68,8 @@ class feedbackdashboard_report_viewed extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'report feedbackdashboard', "report/feedbackdashboard/index.php?id=$this->courseid", $this->courseid);
+        return array($this->courseid, 'course', 'report feedbackdashboard',
+            "report/feedbackdashboard/index.php?id=$this->courseid", $this->courseid);
     }
 
     /**

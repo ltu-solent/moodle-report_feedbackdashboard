@@ -80,8 +80,8 @@ foreach ($courses as $course) {
 if (!$validcourses) {
     echo get_string('nodashboard', 'report_feedbackdashboard');
 } else {
-    echo '<button id="print-btn" onClick="window.print()" class="btn btn-secondary float-right">' . 
-        html_writer::tag('i', '', ['class' => 'fa fa-print']) . ' ' . 
+    echo '<button id="print-btn" onClick="window.print()" class="btn btn-secondary float-right">' .
+        html_writer::tag('i', '', ['class' => 'fa fa-print']) . ' ' .
         get_string('print', 'report_feedbackdashboard') . '</button>';
     echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);
     echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);

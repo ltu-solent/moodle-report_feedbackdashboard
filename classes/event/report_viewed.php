@@ -23,7 +23,6 @@
  */
 namespace report_feedbackdashboard\event;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The report_feedbackdashboard feedbackdashboard report viewed event class.
@@ -76,7 +75,8 @@ class report_viewed extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        $url = "report/feedbackdashboard/user.php?id=". $this->userid . "&course=" . $this->courseid . "&mode=" . $this->other['mode'];
+        $url = "report/feedbackdashboard/user.php?id=". $this->userid . "&course=" . $this->courseid .
+            "&mode=" . $this->other['mode'];
         return array($this->courseid, 'course', 'report feedbackdashboard', $url, $this->courseid);
     }
 
@@ -86,8 +86,10 @@ class report_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/report/feedbackdashboard/user.php', array('course' => $this->courseid, 'id' => $this->relateduserid,
-                'mode' => $this->other['mode']));
+        return new \moodle_url('/report/feedbackdashboard/user.php', array(
+            'course' => $this->courseid,
+            'id' => $this->relateduserid,
+            'mode' => $this->other['mode']));
     }
 
     /**

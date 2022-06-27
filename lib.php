@@ -24,8 +24,6 @@
  */
 
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Get assignments for given courseids
  *
@@ -408,8 +406,6 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
         $table->data[] = $row;
         return $table;
     }
-
-    $gradinginfo = null;
 
     foreach ($assignments as $assignment) {
         if ($assignment->course != $course->id) {
