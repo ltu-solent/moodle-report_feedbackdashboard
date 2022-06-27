@@ -104,7 +104,7 @@ function report_feedbackdashboard_get_submission_status($assignmentids) {
 function report_feedbackdashboard_get_tutor_data($assignmentids){	
 	global $DB;		
 
-	list($inorequalsql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);			
+	list($inorequalsql, $inparams) = $DB->get_in_or_equal($assignmentids);			
 	$params = [] + $inparams;
 
 	$sql = "SELECT a.id, cm.id cm, a.name, a.duedate, c.id course, c.shortname,
@@ -389,8 +389,11 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
 }
 
 function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses){
-	$html = null;
-	if(count($tutorcourses) > 0){			
+	$html = '';
+	if (count($courses) == 0) {
+		return $html;
+	}
+	if (count($tutorcourses) > 0){			
 		$html .= html_writer::tag('h1', get_string('studentdashboard', 'report_feedbackdashboard'));			
 	}
 	$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-instructions']);
@@ -398,66 +401,61 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
 	$html .= get_string('disclaimer', 'report_feedbackdashboard');
 	$html .= html_writer::end_tag('div');
 	
-	if(!empty($courses)){
-		$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
-		$assignmentids = array_keys($assignments);
+	$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
+	
+    if (count($assignments) == 0) {
+        return '';
+    }
+	$assignmentids = array_keys($assignments);
+	$turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
+	$feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
+	$feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
+	$submission = report_feedbackdashboard_get_submission_status($assignmentids);	
+
+	foreach ($courses as $course) { //for each the user's units
+		$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
+		$html .= html_writer::tag('h3', $course->fullname);
+		$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+
+		$table = report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
 		
-		if(count($assignments) > 0){		
-			$turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
-			$feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
-			$feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
-			$submission = report_feedbackdashboard_get_submission_status($assignmentids);	
-
-			foreach ($courses as $course) { //for each the user's units
-				$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
-				$html .= html_writer::tag('h3', $course->fullname);
-				$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
-
-				$table = report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments, $feedbackfiles, $submission); //generate a table containing the assignment information and grades
-				
-				$html .= html_writer::table($table); //show the table
-				$html .= html_writer::end_tag('div');
-			}
-			
-			return $html;
-		}
-	}else{
-		return null;
+		$html .= html_writer::table($table); //show the table
+		$html .= html_writer::end_tag('div');
 	}
+	
+	return $html;
 }
 
-function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses){	
-	global $CFG;
-	require_once($CFG->dirroot.'/mod/assign/externallib.php');	
+function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses) {	
+	$html = '';
+	if (count($courses) == 0) {
+		return $html;
+	}
+	
+	if(count($studentcourses) > 0) {			
+		$html .= html_writer::tag('h1', get_string('tutordashboard', 'report_feedbackdashboard'));			
+	}
+	
+	$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-instructions']);
+	$html .= get_string('instructionstutor', 'report_feedbackdashboard');
+	$html .= html_writer::end_tag('div');
+	
+	$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
 
-	$html = null;
-	if(!empty($courses)){
-		if(count($studentcourses) > 0){			
-			$html .= html_writer::tag('h1', get_string('tutordashboard', 'report_feedbackdashboard'));			
-		}
-		
-		$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-instructions']);
-		$html .= get_string('instructionstutor', 'report_feedbackdashboard');
+    if (count($assignments) == 0) {
+        return '';
+    }
+	$data = report_feedbackdashboard_get_tutor_data(array_keys($assignments));		
+
+	foreach ($courses as $course) {
+		$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
+		$html .= html_writer::tag('h3', $course->fullname);
+		$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+
+		 // Generate a table containing the assignment information and grades.
+		$table = report_feedbackdashboard_create_tutor_table($course, $data);
+		$html .= html_writer::table($table); //show the table
 		$html .= html_writer::end_tag('div');
-		
-		$assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
-
-		if(count($assignments) > 0){		
-			$data = report_feedbackdashboard_get_tutor_data(array_keys($assignments));		
-
-			foreach ($courses as $course) { //for each the user's units
-				$html .= html_writer::start_tag('div', ['class'=>'feedbackdashboard-course']);
-				$html .= html_writer::tag('h3', $course->fullname);
-				$html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
-
-				$table = report_feedbackdashboard_create_tutor_table($course, $data); //generate a table containing the assignment information and grades
-				$html .= html_writer::table($table); //show the table
-				$html .= html_writer::end_tag('div');
-			}
-			
-			return $html;
-		}
-	}else{
-		return null;
-	}		
+	}
+	return $html;
 }
