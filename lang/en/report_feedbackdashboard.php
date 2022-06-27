@@ -35,6 +35,7 @@ $string['eventfeedbackdashboardreportviewed'] = 'Feedback dashboard viewed';
 $string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment';
 $string['feedbackdashboard'] = 'Feedback dashboard';
+$string['feedbackdashboard:view'] = 'View feedback dashboard';
 $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';
