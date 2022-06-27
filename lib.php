@@ -162,7 +162,7 @@ function report_feedbackdashboard_get_submission_status($assignmentids) {
 function report_feedbackdashboard_get_tutor_data($assignmentids) {
     global $DB;
 
-    list($inorequalsql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_QM, '', 1);
+    list($inorequalsql, $inparams) = $DB->get_in_or_equal($assignmentids);
     $params = [] + $inparams;
 
     $sql = "SELECT a.id, cm.id cm, a.name, a.duedate, c.id course, c.shortname,
@@ -267,11 +267,12 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
             foreach ($grades as $g => $v) {
                 $cmid = $assignments[$v->iteminstance]->cm;
                 $row = new html_table_row();
-
+                // Assignment name and link.
                 $cell1 = new html_table_cell(
                     html_writer::link(new moodle_url('/mod/assign/view.php', ['id' => $cmid]), $v->name)
                 );
 
+                // Show due date.
                 if ($assignments[$v->iteminstance]->duedate !== "0") {
                     $cell2 = new html_table_cell(date('d-m-Y, g:i A', $assignments[$v->iteminstance]->duedate));
                 } else {
@@ -294,43 +295,52 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
                         $cell4 = new html_table_cell(date('d-m-Y, g:i A', ($v->grades[$USER->id]->dategraded)));
                     }
 
-                    $cell5 = new html_table_cell();
-                    $cell5->text .= '<ul>';
-                    $cell5empty = true;
+                    $feedbackitems = [];
+                    // Turnitin feedback.
                     if (isset($turnitinfeedback[$v->iteminstance]) && $turnitinfeedback[$v->iteminstance]->feedback == "1") {
-                        $cell5->text .= '<li>';
-                        $cell5->text .= html_writer::link(
-                            new moodle_url('/mod/assign/view.php', ['id' => $cmid], 'submissionstatus'), $txt->feedbackturnitin);
-                        $cell5->text .= '</li>';
-                        $cell5empty = false;
+                        $feedbackitems[] = html_writer::link(
+                            new moodle_url('/mod/assign/view.php',
+                                ['id' => $assignments[$v->iteminstance]->cm],
+                                'submissionstatus'),
+                            get_string('feedbackturnitin', 'report_feedbackdashboard')
+                        );
                     }
 
+                    // Feedback files.
                     if (isset($feedbackfiles[$v->iteminstance])
                         && ($feedbackfiles[$v->iteminstance]->numfiles !== null
                         && $feedbackfiles[$v->iteminstance]->numfiles !== "0")) {
-                        $cell5->text .= '<li>';
-                        $cell5->text .= html_writer::link(
-                            new moodle_url('/mod/assign/view.php', ['id' => $cmid], 'feedback'), $txt->feedbackfile);
-                        $cell5->text .= '</li>';
-                        $cell5empty = false;
+
+                        $feedbackitems[] = html_writer::link(
+                            new moodle_url('/mod/assign/view.php',
+                                ['id' => $assignments[$v->iteminstance]->cm],
+                                'feedback'),
+                            get_string('feedbackfile', 'report_feedbackdashboard')
+                        );
                     }
 
+                    // Comment feedback.
                     if (isset($feedbackcomments[$v->iteminstance])
                         && ($feedbackcomments[$v->iteminstance]->commenttext !== ''
                         && $feedbackcomments[$v->iteminstance]->commenttext !== null)) {
-                        $cell5->text .= '<li>';
-                        $cell5->text .= html_writer::link(
-                            new moodle_url('/mod/assign/view.php', ['id' => $cmid], 'feedback'), $txt->feedbackcomment);
-                        $cell5->text .= '</li>';
-                        $cell5empty = false;
+
+                        $feedbackitems[] = html_writer::link(
+                            new moodle_url('/mod/assign/view.php',
+                                ['id' => $assignments[$v->iteminstance]->cm],
+                                'feedback'),
+                            get_string('feedbackcomment', 'report_feedbackdashboard')
+                        );
                     }
-                    $cell5->text .= '</ul>';
-                    if ($cell5empty) {
-                        $cell5 = new html_table_cell($txt->emptycell);
+                    if (count($feedbackitems) > 0) {
+                        $cell5 = new html_table_cell(html_writer::alist($feedbackitems));
+                    } else {
+                        $cell5 = new html_table_cell(get_string('emptycell', 'report_feedbackdashboard'));
                     }
 
-                    $cell6 = new html_table_cell($v->grades[$USER->id]->str_grade); // Show the grade.
-                } else { // If the assignment is not locked, don't show feedback or grades.
+                    // Show the grade.
+                    $cell6 = new html_table_cell($v->grades[$USER->id]->str_grade);
+                } else {
+                    // If the assignment is not locked, don't show feedback or grades.
                     $cell4 = new html_table_cell($txt->emptycell);
                     $cell5 = new html_table_cell($txt->emptycell);
                     $cell6 = new html_table_cell($txt->emptycell);
@@ -447,11 +457,13 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
         $cell5 = new html_table_cell($txt->students . $assignment->students . $submissions);
 
         $message = '';
+        // Grading due date has passed and grading hasn't been done yet.
         if ($assignment->gradingurgent == 1 && $assignment->students != 0) {
             $message = $txt->gradingrelease;
             $row->attributes['class'] = 'grading-action';
         }
 
+        // Grading due in n days (if assignment duedate has passed).
         if ($assignment->duedate < $assignment->timenow &&
             $assignment->gradingduedate > $assignment->timenow &&
             $assignment->students != 0) {
@@ -463,11 +475,13 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
             $row->attributes['class'] = 'grading-warning';
         }
 
+        // Grades have been released, but the assignment is invisible (students can't see grades).
         if ($assignment->locked != 0 && $assignment->visible == 0 && $assignment->students != 0) {
             $message = $txt->gradingreleasedhidden;
             $row->attributes['class'] = 'grading-action';
         }
 
+        // Grades have been released, but their identities have not (student can't see grades).
         if ($assignment->locked != 0 &&
             $assignment->blindmarking == 1 &&
             $assignment->revealidentities == 0 &&
@@ -476,11 +490,13 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
             $row->attributes['class'] = 'grading-action';
         }
 
+        // Grades have been released - all good.
         if ($assignment->gradesvisible == 1 && $assignment->students != 0) {
             $message = $txt->gradingreleased;
             $row->attributes['class'] = 'grading-complete';
         }
 
+        // Marking has passed the grading due date.
         if ($assignment->gradinglate == 1 && $assignment->students != 0) {
             // Work out number of days late.
             if ($assignment->locked == 0) {
@@ -513,7 +529,10 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
  * @return string HTML of the Student Dashboard page
  */
 function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses) {
-    $html = null;
+    $html = '';
+    if (count($courses) == 0) {
+        return $html;
+    }
     if (count($tutorcourses) > 0) {
         $html .= html_writer::tag('h1', get_string('studentdashboard', 'report_feedbackdashboard'));
     }
@@ -522,10 +541,6 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
     $html .= get_string('disclaimer', 'report_feedbackdashboard');
     $html .= html_writer::end_tag('div');
 
-    if (empty($courses)) {
-        return '';
-    }
-
     $assignments = report_feedbackdashboard_get_assignments(array_keys($courses));
 
     if (count($assignments) == 0) {
@@ -533,7 +548,6 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
     }
 
     $assignmentids = array_keys($assignments);
-
     $turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
     $feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
     $feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
@@ -570,7 +584,7 @@ function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses)
     require_once($CFG->dirroot.'/mod/assign/externallib.php');
 
     $html = '';
-    if (empty($courses)) {
+    if (count($courses) == 0) {
         return $html;
     }
     if (count($studentcourses) > 0) {
