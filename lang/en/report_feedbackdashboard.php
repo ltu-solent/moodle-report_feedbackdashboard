@@ -17,11 +17,12 @@
 /**
  * Strings
  *
- * @package    report
- * @subpackage feedbackdashboard
+ * @package    report_feedbackdashboard
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $string['assignmentname'] = 'Assignment';
 $string['datesubmitted'] = 'Date Submitted';
@@ -51,15 +52,15 @@ $string['hidden'] = ' (hidden)';
 $string['instructionsstudent'] = '<p>This is an overview of where to find your feedback for all summative assignments across all your modules.</p><p>Links will become available to grades and feedback locations after feedback has been released by the module leader. Feedback could be in the form of feedback comments, feedback files or comments in Turnitin (click the blue pencil to view).</p>
 <p>To get the most out of your feedback:</p>
 <ul>
-	<li>Read your feedback</li><li>Look for common themes around improvement in the comments</li>
-	<li>Find support to develop areas for improvement in <a href="https://learn.solent.ac.uk/succeed" target="_blank">Succeed@Solent</a></li>
-	<li><a href="https://learn.solent.ac.uk/course/view.php?id=31636&section=3" target="_blank">Create a plan</a> for how to improve further assessments</li>
+    <li>Read your feedback</li><li>Look for common themes around improvement in the comments</li>
+    <li>Find support to develop areas for improvement in <a href="https://learn.solent.ac.uk/succeed" target="_blank">Succeed@Solent</a></li>
+    <li><a href="https://learn.solent.ac.uk/course/view.php?id=31636&section=3" target="_blank">Create a plan</a> for how to improve further assessments</li>
 </ul>';
 $string['instructionstutor'] = "<p>Students cannot see grades in their view personal of this dashboard unless the assignment is highlighted green in the tutor dashboard.</p>
 <ul>
-	<li>If the grading period has passed but students cannot see their grades the assignment will be highlighted red</li>
-	<li> If today's date falls between the due date and grade by date, grading is due and the assignment will be highlighted amber</li>
-	<li>If the students can see their grades the assignment will be green</li>
+    <li>If the grading period has passed but students cannot see their grades the assignment will be highlighted red</li>
+    <li> If today's date falls between the due date and grade by date, grading is due and the assignment will be highlighted amber</li>
+    <li>If the students can see their grades the assignment will be green</li>
 </ul>
 <p>Use the browser search to find modules (Windows: Ctrl+f / iOS: cmd+f)</p>";
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';

@@ -44,12 +44,9 @@ table#feedbackdashboard {
 }
 
 .feedbackdashboard-course .cell {
-  width: 16.666%;
+  /* width: 16.666%; */
 }
 
-#page-report-feedbackdashboard-index #print-btn {
-  float: right;
-}
 
 @media print {
   #page-report-feedbackdashboard-index #page {

@@ -17,14 +17,13 @@
 /**
  * Display a user grade report for all courses
  *
- * @package    report
- * @subpackage feedbackdashboard
+ * @package    report_feedbackdashboard
  * @copyright  2019 onwards Solent University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 require_once('../../config.php');
+require_login(null, false);
 require_once($CFG->dirroot .'/report/feedbackdashboard/lib.php');
 
 if (isguestuser()) {
@@ -39,13 +38,13 @@ $PAGE->set_title(get_string('pluginname', 'report_feedbackdashboard'));
 $PAGE->set_heading(fullname($USER) . ' - ' . get_string('pluginname', 'report_feedbackdashboard'));
 
 // Trigger an grade report viewed event.
-$event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create(array(
-            'context' => context_user::instance($USER->id),
-            'relateduserid' => $USER->id,
-            'other' => array(
-                  'userid' => $USER->id
-              )
-          ));
+$event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create([
+    'context' => context_user::instance($USER->id),
+    'relateduserid' => $USER->id,
+    'other' => [
+        'userid' => $USER->id
+    ]
+]);
 $event->trigger();
 
 echo $OUTPUT->header();
@@ -61,28 +60,29 @@ if (count($courses) == 0) {
 $studentcourses = array();
 $tutorcourses = array();
 $validcourses = false;
-
 foreach ($courses as $course) {
     $category = core_course_category::get($course->category, IGNORE_MISSING);
     $context = context_course::instance($course->id);
-    
+
     // Shows all modules to students.
     if (has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false) {
         $studentcourses[$course->id] = $course;
-        $validcourses = true;
+        $validcourses = 1;
     }
 
     // Shows only current modules to tutors.
     if (has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false) {
         $tutorcourses[$course->id] = $course;
-        $validcourses = true;
-    }		
+        $validcourses = 1;
+    }
 }
 
 if (!$validcourses) {
     echo get_string('nodashboard', 'report_feedbackdashboard');
 } else {
-    echo '<button id="print-btn" class="btn btn-primary" onClick="window.print()">' . get_string('print', 'report_feedbackdashboard') . '</button><br>';
+    echo '<button id="print-btn" onClick="window.print()" class="btn btn-secondary float-right">' . 
+        html_writer::tag('i', '', ['class' => 'fa fa-print']) . ' ' . 
+        get_string('print', 'report_feedbackdashboard') . '</button>';
     echo report_feedbackdashboard_get_student_dashboard($studentcourses, $tutorcourses);
     echo report_feedbackdashboard_get_tutor_dashboard($tutorcourses, $studentcourses);
 }
