@@ -108,6 +108,30 @@ function report_feedbackdashboard_get_feedback_comments($assignmentids) {
     return $comments;
 }
 
+function report_feedbackdashboard_get_feedback_structured($assignmentids) {
+    global $DB, $USER;
+    list($insql, $inparams) = $DB->get_in_or_equal($assignmentids, SQL_PARAMS_NAMED, '', 1);
+    $params = ['userid' => $USER->id] + $inparams;
+    $sql = "SELECT fs.id, fs.assignment as assignid, fs.commenttext
+        FROM {assignfeedback_structured} fs
+        JOIN {assign_grades} ag ON fs.grade = ag.id
+        WHERE ag.userid = :userid
+        AND fs.assignment {$insql}";
+    $comments = $DB->get_records_sql($sql, $params);
+    $structuredcomments = [];
+    foreach ($comments as $comment) {
+        if (!isset($structuredcomments[$comment->assignid])) {
+            $structuredcomments[$comment->assignid] = (object)[
+                'id' => $comment->assignid,
+                'commenttext' => $comment->commenttext
+            ];
+        } else {
+            $structuredcomments[$comment->assignid]->commenttext .= $comment->commenttext;
+        }
+    }
+    return $structuredcomments;
+}
+
 /**
  * Get feedback file count from Feedback Files subplugin for given assignment IDs
  *
@@ -235,7 +259,7 @@ function report_feedbackdashboard_get_tutor_data($assignmentids) {
  * @return html_table HTML output of Course Feedback table
  */
 function report_feedbackdashboard_create_student_table($course, $assignments, $turnitinfeedback, $feedbackcomments,
-    $feedbackfiles, $submission) {
+    $feedbackstructured, $feedbackfiles, $submission) {
     global $CFG, $USER;
 
     $txt = get_strings(
@@ -329,6 +353,17 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
                             get_string('feedbackcomment', 'report_feedbackdashboard')
                         );
                     }
+
+                    if (isset($feedbackstructured[$v->iteminstance])
+                        && ($feedbackstructured[$v->iteminstance]->commenttext !== ''
+                        && $feedbackstructured[$v->iteminstance]->commenttext !== null)) {
+                            $feedbackitems[] = html_writer::link(
+                                new moodle_url('/mod/assign/view.php',
+                                    ['id' => $assignments[$v->iteminstance]->cm],
+                                    'feedback'),
+                                'Structured Feedback'
+                            );
+                        }
                     if (count($feedbackitems) > 0) {
                         $cell5 = new html_table_cell(html_writer::alist($feedbackitems));
                     } else {
@@ -546,6 +581,7 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
     $assignmentids = array_keys($assignments);
     $turnitinfeedback = report_feedbackdashboard_get_turnitin_feedback($assignmentids);
     $feedbackcomments = report_feedbackdashboard_get_feedback_comments($assignmentids);
+    $feedbackstructured = report_feedbackdashboard_get_feedback_structured($assignmentids);
     $feedbackfiles = report_feedbackdashboard_get_feedback_files($assignmentids);
     $submission = report_feedbackdashboard_get_submission_status($assignmentids);
 
@@ -559,6 +595,7 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
             $assignments,
             $turnitinfeedback,
             $feedbackcomments,
+            $feedbackstructured,
             $feedbackfiles,
             $submission
         );

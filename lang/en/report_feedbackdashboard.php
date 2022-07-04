@@ -38,6 +38,7 @@ $string['feedbackcomment'] = 'Feedback comment';
 $string['feedbackdashboard'] = 'Feedback dashboard';
 $string['feedbackdashboard:view'] = 'View feedback dashboard';
 $string['feedbackfile'] = 'Feedback file(s)';
+$string['feedbackstructured'] = 'Structured feedback';
 $string['feedbackturnitin'] = 'Turnitin feedback';
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
