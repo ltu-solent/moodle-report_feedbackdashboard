@@ -75,7 +75,6 @@ foreach ($courses as $course) {
     // Shows only current modules to tutors.
     $iscurrent = ((($course->startdate >= $currentac['startdate']) && ($course->enddate <= $currentac['enddate'])) || // Current academic year.
         (($course->startdate < $now) && ($course->enddate > $now))); // Currently running (covers spans).
-        echo "{$course->idnumber}:{$category->idnumber}($iscurrent), ";
     $ismodule = preg_match('/modules_/', $category->idnumber);
     if (has_capability('mod/assign:grade', $context) && $ismodule && $iscurrent) {
         $tutorcourses[$course->id] = $course;
