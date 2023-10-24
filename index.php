@@ -42,8 +42,8 @@ $event = \report_feedbackdashboard\event\feedbackdashboard_report_viewed::create
     'context' => context_user::instance($USER->id),
     'relateduserid' => $USER->id,
     'other' => [
-        'userid' => $USER->id
-    ]
+        'userid' => $USER->id,
+    ],
 ]);
 $event->trigger();
 
@@ -57,8 +57,8 @@ if (count($courses) == 0) {
     exit();
 }
 
-$studentcourses = array();
-$tutorcourses = array();
+$studentcourses = [];
+$tutorcourses = [];
 $validcourses = false;
 $currentac = report_feedbackdashboard_current_academic_year();
 $now = time();
@@ -73,8 +73,11 @@ foreach ($courses as $course) {
     }
 
     // Shows only current modules to tutors.
-    $iscurrent = ((($course->startdate >= $currentac['startdate']) && ($course->enddate <= $currentac['enddate'])) || // Current academic year.
-        (($course->startdate < $now) && ($course->enddate > $now))); // Currently running (covers spans).
+    $iscurrent = (
+        // Current academic year.
+        (($course->startdate >= $currentac['startdate']) && ($course->enddate <= $currentac['enddate'])) ||
+        // Currently running (covers spans).
+        (($course->startdate < $now) && ($course->enddate > $now)));
     $ismodule = preg_match('/modules_/', $category->idnumber);
     if (has_capability('mod/assign:grade', $context) && $ismodule && $iscurrent) {
         $tutorcourses[$course->id] = $course;

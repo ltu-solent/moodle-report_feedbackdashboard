@@ -239,14 +239,25 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
     global $CFG, $USER;
 
     $txt = get_strings(
-            ['assignmentname', 'duedate', 'datesubmitted', 'gradeddate', 'feedback', 'grade',
-            'emptycell', 'nosubmitteddate', 'feedbackturnitin', 'feedbackfile', 'feedbackcomment'],
+            [
+                'assignmentname',
+                'duedate',
+                'datesubmitted',
+                'gradeddate',
+                'feedback',
+                'grade',
+                'emptycell',
+                'nosubmitteddate',
+                'feedbackturnitin',
+                'feedbackfile',
+                'feedbackcomment',
+            ],
             'report_feedbackdashboard');
 
     $table = new html_table();
     $table->attributes['class'] = 'generaltable boxaligncenter';
     $table->id = 'feedbackdashboard';
-    $table->head = array($txt->assignmentname, $txt->duedate, $txt->datesubmitted, $txt->gradeddate, $txt->feedback, $txt->grade);
+    $table->head = [$txt->assignmentname, $txt->duedate, $txt->datesubmitted, $txt->gradeddate, $txt->feedback, $txt->grade];
 
     $gradinginfo = null;
     $assigncount = 0;
@@ -344,7 +355,7 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
                     $cell6 = new html_table_cell($txt->emptycell);
                 }
 
-                $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
+                $row->cells = [$cell1, $cell2, $cell3, $cell4, $cell5, $cell6];
 
                 $table->data[] = $row;
             }
@@ -355,7 +366,7 @@ function report_feedbackdashboard_create_student_table($course, $assignments, $t
         $fillercell = new html_table_cell();
         $fillercell->text = html_writer::tag('p', get_string('noassignments', 'report_feedbackdashboard'));
         $fillercell->colspan = 6;
-        $row = new html_table_row(array($fillercell));
+        $row = new html_table_row([$fillercell]);
         $table->data[] = $row;
     }
 
@@ -374,9 +385,23 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
     $txt = get_strings(
-        array('assignmentname', 'duedate', 'gradingdue', 'submissiontypes', 'submissions', 'gradingstatus', 'hidden',
-        'celldrafts', 'cellsubmissions', 'students', 'gradingrelease', 'gradingreleasedhidden',
-        'gradingreleasedidentities', 'gradingreleased', 'noassignments'),
+        [
+            'assignmentname',
+            'duedate',
+            'gradingdue',
+            'submissiontypes',
+            'submissions',
+            'gradingstatus',
+            'hidden',
+            'celldrafts',
+            'cellsubmissions',
+            'students',
+            'gradingrelease',
+            'gradingreleasedhidden',
+            'gradingreleasedidentities',
+            'gradingreleased',
+            'noassignments',
+        ],
         'report_feedbackdashboard');
 
     $assigncount = 0;
@@ -395,14 +420,14 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
         $txt->gradingdue,
         $txt->submissiontypes,
         $txt->submissions,
-        $txt->gradingstatus
+        $txt->gradingstatus,
     ];
 
     if ($assigncount == 0) {
         $fillercell = new html_table_cell();
         $fillercell->text = html_writer::tag('p', $txt->noassignments);
         $fillercell->colspan = 6;
-        $row = new html_table_row(array($fillercell));
+        $row = new html_table_row([$fillercell]);
         $table->data[] = $row;
         return $table;
     }
@@ -510,7 +535,7 @@ function report_feedbackdashboard_create_tutor_table($course, $assignments) {
             $cell6 = new html_table_cell($message);
         }
 
-        $row->cells = array($cell1, $cell2, $cell3, $cell4, $cell5, $cell6);
+        $row->cells = [$cell1, $cell2, $cell3, $cell4, $cell5, $cell6];
         $table->data[] = $row;
     }
 
@@ -645,6 +670,6 @@ function report_feedbackdashboard_current_academic_year() {
 
     return [
         'startdate' => date('U', mktime(0, 0, 0, 8, 1, $yearstart)),
-        'enddate' => date('U', mktime(23, 59, 59, 7, 31, $yearend))
+        'enddate' => date('U', mktime(23, 59, 59, 7, 31, $yearend)),
     ];
 }

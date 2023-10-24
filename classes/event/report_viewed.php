@@ -77,7 +77,7 @@ class report_viewed extends \core\event\base {
     protected function get_legacy_logdata() {
         $url = "report/feedbackdashboard/user.php?id=". $this->userid . "&course=" . $this->courseid .
             "&mode=" . $this->other['mode'];
-        return array($this->courseid, 'course', 'report feedbackdashboard', $url, $this->courseid);
+        return [$this->courseid, 'course', 'report feedbackdashboard', $url, $this->courseid];
     }
 
     /**
@@ -86,10 +86,11 @@ class report_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/report/feedbackdashboard/user.php', array(
+        return new \moodle_url('/report/feedbackdashboard/user.php', [
             'course' => $this->courseid,
             'id' => $this->relateduserid,
-            'mode' => $this->other['mode']));
+            'mode' => $this->other['mode'],
+        ]);
     }
 
     /**
@@ -108,6 +109,11 @@ class report_viewed extends \core\event\base {
         }
     }
 
+    /**
+     * Not used
+     *
+     * @return mixed
+     */
     public static function get_other_mapping() {
         // Nothing to map.
         return false;
