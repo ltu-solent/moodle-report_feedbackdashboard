@@ -529,6 +529,7 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
     if (count($courses) == 0) {
         return $html;
     }
+    // Only showing a heading if this users has the tutor dashboard.
     if (count($tutorcourses) > 0) {
         $html .= html_writer::tag('h1', get_string('studentdashboard', 'report_feedbackdashboard'));
     }
@@ -551,8 +552,15 @@ function report_feedbackdashboard_get_student_dashboard($courses, $tutorcourses)
 
     foreach ($courses as $course) {
         $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
-        $html .= html_writer::tag('h3', $course->fullname);
-        $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+        $html .= html_writer::tag('h3',
+            html_writer::link(
+                new moodle_url('/course/view.php', ['id' => $course->id]),
+                $course->fullname
+            )
+        );
+        $enddate = ($course->enddate > 0) ? date( "d/m/Y", $course->enddate) : '';
+        $html .= html_writer::tag('p', $course->shortname . '<br />' .
+            date('d/m/Y', $course->startdate) . ' - ' . $enddate);
 
         $table = report_feedbackdashboard_create_student_table(
             $course,
@@ -583,6 +591,7 @@ function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses)
     if (count($courses) == 0) {
         return $html;
     }
+    // Only showing a heading if this users has the student dashboard.
     if (count($studentcourses) > 0) {
         $html .= html_writer::tag('h1', get_string('tutordashboard', 'report_feedbackdashboard'));
     }
@@ -601,12 +610,41 @@ function report_feedbackdashboard_get_tutor_dashboard($courses, $studentcourses)
 
     foreach ($courses as $course) {
         $html .= html_writer::start_tag('div', ['class' => 'feedbackdashboard-course']);
-        $html .= html_writer::tag('h3', $course->fullname);
-        $html .= html_writer::tag('p', date('d/m/Y', $course->startdate) . ' - ' . date( "d/m/Y", $course->enddate));
+        $html .= html_writer::tag('h3',
+            html_writer::link(
+                new moodle_url('/course/view.php', ['id' => $course->id]),
+                $course->fullname
+            )
+        );
+        $enddate = ($course->enddate > 0) ? date( "d/m/Y", $course->enddate) : '';
+        $html .= html_writer::tag('p', $course->shortname . '<br />' .
+            date('d/m/Y', $course->startdate) . ' - ' . $enddate);
 
         $table = report_feedbackdashboard_create_tutor_table($course, $data);
         $html .= html_writer::table($table);
         $html .= html_writer::end_tag('div');
     }
     return $html;
+}
+
+/**
+ * If the current month is Jan-July, the academic year is now - 1
+ *
+ * @return array startdate and enddate in time format
+ */
+function report_feedbackdashboard_current_academic_year() {
+    $cyear = date('Y');
+    $cmonth = date('n');
+    $yearend = $cyear;
+    $yearstart = $cyear;
+    if ($cmonth < 8) {
+        $yearstart = $cyear - 1;
+    } else {
+        $yearend = $cyear + 1;
+    }
+
+    return [
+        'startdate' => date('U', mktime(0, 0, 0, 8, 1, $yearstart)),
+        'enddate' => date('U', mktime(23, 59, 59, 7, 31, $yearend))
+    ];
 }

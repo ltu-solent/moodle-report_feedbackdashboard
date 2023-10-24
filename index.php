@@ -60,6 +60,8 @@ if (count($courses) == 0) {
 $studentcourses = array();
 $tutorcourses = array();
 $validcourses = false;
+$currentac = report_feedbackdashboard_current_academic_year();
+$now = time();
 foreach ($courses as $course) {
     $category = core_course_category::get($course->category, IGNORE_MISSING);
     $context = context_course::instance($course->id);
@@ -71,7 +73,11 @@ foreach ($courses as $course) {
     }
 
     // Shows only current modules to tutors.
-    if (has_capability('mod/assign:grade', $context) && strpos($category->idnumber, 'modules_current') !== false) {
+    $iscurrent = ((($course->startdate >= $currentac['startdate']) && ($course->enddate <= $currentac['enddate'])) || // Current academic year.
+        (($course->startdate < $now) && ($course->enddate > $now))); // Currently running (covers spans).
+        echo "{$course->idnumber}:{$category->idnumber}($iscurrent), ";
+    $ismodule = preg_match('/modules_/', $category->idnumber);
+    if (has_capability('mod/assign:grade', $context) && $ismodule && $iscurrent) {
         $tutorcourses[$course->id] = $course;
         $validcourses = 1;
     }

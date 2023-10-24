@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['assignmentname'] = 'Assignment';
 $string['datesubmitted'] = 'Date Submitted';
-$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit the <a href='https://portal.solent.ac.uk/portal-apps/results/results.aspx'>Results app on the Portal.</a></p>";
+$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit the <a href='https://student-results.app.solent.ac.uk/'>Results app on the Portal.</a></p>";
 $string['celldrafts'] = '<br>Drafts: ';
 $string['cellsubmissions'] = '<br>Submissions: ';
 $string['duedate'] = 'Due Date';
