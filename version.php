@@ -24,8 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021050504;
-$plugin->requires  = 2016112900;
+$plugin->version   = 2023102400;
+$plugin->requires  = 2022112800;
 $plugin->component = 'report_feedbackdashboard';
-$plugin->release = '3.9.2';
-
+$plugin->release = '4.1-r1';
