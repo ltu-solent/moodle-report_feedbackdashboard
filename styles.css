@@ -29,8 +29,8 @@ table#feedbackdashboard {
 }
 
 #feedbackdashboard th,
-    td {
-        padding: 5px !important;
+td {
+    padding: 5px !important;
 }
 
 #feedbackdashboard td {
@@ -38,7 +38,7 @@ table#feedbackdashboard {
 }
 
 .feedbackdashboard-instructions {
-	margin-top: 30px;
+    margin-top: 30px;
 }
 
 .feedbackdashboard-course {
