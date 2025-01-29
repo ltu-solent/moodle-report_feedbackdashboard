@@ -25,30 +25,37 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['assignmentname'] = 'Assignment';
-$string['datesubmitted'] = 'Date Submitted';
-$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit the <a href='https://student-results.app.solent.ac.uk/'>Results app on the Portal.</a></p>";
+
 $string['celldrafts'] = '<br>Drafts: ';
 $string['cellsubmissions'] = '<br>Submissions: ';
-$string['duedate'] = 'Due Date';
+
+$string['datesubmitted'] = 'Date Submitted';
 $string['dayslate'] = ' ({$a->dayslate} days late)';
+$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit the <a href='https://student-results.app.solent.ac.uk/'>Results app on the Portal.</a></p>";
+$string['duedate'] = 'Due Date';
+
 $string['emptycell'] = '-';
 $string['eventfeedbackdashboardreportviewed'] = 'Feedback dashboard viewed';
+
 $string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment';
 $string['feedbackdashboard'] = 'Feedback dashboard';
 $string['feedbackdashboard:view'] = 'View feedback dashboard';
 $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
+
 $string['grade'] = 'Grade';
 $string['gradeddate'] = 'Date Graded';
 $string['gradingdue'] = 'Grading due';
 $string['gradingduein'] = 'Grading due in {$a->days} days';
-$string['gradingstatus'] = 'Grading status';
 $string['gradingrelease'] = 'Grades need to be released';
 $string['gradingreleased'] = 'Grades released';
 $string['gradingreleasedhidden'] = 'Released but assignment is hidden from students';
 $string['gradingreleasedidentities'] = 'Released but identities need revealing';
+$string['gradingstatus'] = 'Grading status';
+
 $string['hidden'] = ' (hidden)';
+
 $string['instructionsstudent'] = '<p>This is an overview of where to find your feedback for all summative assignments across all your modules.</p><p>Links will become available to grades and feedback locations after feedback has been released by the module leader. Feedback could be in the form of feedback comments, feedback files or comments in Turnitin (click the blue pencil to view).</p>
 <p>To get the most out of your feedback:</p>
 <ul>
@@ -63,16 +70,21 @@ $string['instructionstutor'] = "<p>Students cannot see grades in their view pers
     <li>If the students can see their grades the assignment will be green</li>
 </ul>
 <p>Use the browser search to find modules (Windows: Ctrl+f / iOS: cmd+f)</p>";
+
 $string['loggedout'] = 'You do not have permission to view this page (please check you are logged in).';
+
 $string['noassignments'] = 'There are currently no assignments for this module';
 $string['nodashboard'] = 'You do not appear to be enrolled on any modules';
 $string['nosubmitteddate'] = 'Not submitted';
+
 $string['pluginname'] = 'Feedback Dashboard';
 $string['print'] = 'Print this report';
+
 $string['studentdashboard'] = 'Student dashboard';
 $string['students'] = 'Students: ';
 $string['submissions'] = 'Submissions';
 $string['submissiontypes'] = 'Submission types';
+
 $string['tutordashboard'] = 'Tutor dashboard';
 
 $string['viewfeedbackerror'] = 'Sorry, you do not have permissions to view feedback.';
