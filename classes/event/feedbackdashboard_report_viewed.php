@@ -63,21 +63,6 @@ class feedbackdashboard_report_viewed extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            'course',
-            'report feedbackdashboard',
-            "report/feedbackdashboard/index.php?id=$this->courseid",
-            $this->courseid,
-        ];
-    }
-
-    /**
      * Returns relevant URL.
      *
      * @return \moodle_url
