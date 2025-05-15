@@ -70,17 +70,6 @@ class report_viewed extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        $url = "report/feedbackdashboard/user.php?id=". $this->userid . "&course=" . $this->courseid .
-            "&mode=" . $this->other['mode'];
-        return [$this->courseid, 'course', 'report feedbackdashboard', $url, $this->courseid];
-    }
-
-    /**
      * Returns relevant URL.
      *
      * @return \moodle_url
