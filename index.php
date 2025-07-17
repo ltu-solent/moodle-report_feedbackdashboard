@@ -67,7 +67,9 @@ foreach ($courses as $course) {
     $context = context_course::instance($course->id);
 
     // Shows all modules to students.
-    if (has_capability('mod/assign:submit', $context) && strpos($category->idnumber, 'modules_') !== false) {
+    $coursecat = $category->idnumber ?? 'noidnumber';
+    $ismodule = (strpos($coursecat, 'modules_') !== false);
+    if (has_capability('mod/assign:submit', $context) && $ismodule) {
         $studentcourses[$course->id] = $course;
         $validcourses = 1;
     }
@@ -78,7 +80,6 @@ foreach ($courses as $course) {
         (($course->startdate >= $currentac['startdate']) && ($course->enddate <= $currentac['enddate'])) ||
         // Currently running (covers spans).
         (($course->startdate < $now) && ($course->enddate > $now)));
-    $ismodule = preg_match('/modules_/', $category->idnumber);
     if (has_capability('mod/assign:grade', $context) && $ismodule && $iscurrent) {
         $tutorcourses[$course->id] = $course;
         $validcourses = 1;
