@@ -31,15 +31,15 @@ $string['cellsubmissions'] = '<br>Submissions: ';
 
 $string['datesubmitted'] = 'Date Submitted';
 $string['dayslate'] = ' ({$a->dayslate} days late)';
-$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit the <a href='https://student-results.app.solent.ac.uk/'>Results app on the Portal.</a></p>";
+$string['disclaimer'] = "<p id='disclaimer'>All grades available in Solent Online Learning are provisional and subject to change. To view confirmed, final grades please visit <a href='https://gateway.solent.ac.uk'>Gateway</a>.</p>";
 $string['duedate'] = 'Due Date';
 
 $string['emptycell'] = '-';
-$string['eventfeedbackdashboardreportviewed'] = 'Feedback dashboard viewed';
+$string['eventfeedbackdashboardreportviewed'] = 'Assessment dashboard viewed';
 
 $string['feedback'] = 'View Feedback';
 $string['feedbackcomment'] = 'Feedback comment';
-$string['feedbackdashboard'] = 'Feedback dashboard';
+$string['feedbackdashboard'] = 'Assessment dashboard';
 $string['feedbackdashboard:view'] = 'View feedback dashboard';
 $string['feedbackfile'] = 'Feedback file(s)';
 $string['feedbackturnitin'] = 'Turnitin feedback';
@@ -77,7 +77,7 @@ $string['noassignments'] = 'There are currently no assignments for this module';
 $string['nodashboard'] = 'You do not appear to be enrolled on any modules';
 $string['nosubmitteddate'] = 'Not submitted';
 
-$string['pluginname'] = 'Feedback Dashboard';
+$string['pluginname'] = 'Assessment Dashboard';
 $string['print'] = 'Print this report';
 
 $string['studentdashboard'] = 'Student dashboard';
